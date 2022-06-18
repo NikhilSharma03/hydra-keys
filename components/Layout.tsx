@@ -64,6 +64,7 @@ const Layout = ({ children }: LayoutProps) => {
                 type="checkbox"
                 className="drawer-toggle"
                 checked={sidebarActive}
+                readOnly={true}
               />
               <div className="drawer-content">
                 <Navbar drawerId="nav-drawer" />
