@@ -73,9 +73,15 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
+.section2Size {
+  height: 900px;
+  background-color: #F9F8F8;
+}
+
 .modalSize {
   height: 500px;
   width: 340px;
+  background-color: rgb(255, 255, 255);
   border: 2px solid black;
 }
 
@@ -84,15 +90,6 @@ input[type=number] {
   padding-left: 15px;
   padding-right: 15px;
   height: 100px;
-}
-
-.section2Size {
-  height: 900px;
-  background-color: #F9F8F8;
-}
-
-.noDarkEffect {
-  color: black;
 }
 
 .modalSize:hover {
@@ -171,4 +168,16 @@ input[type=number] {
 
   }
 
+}
+
+[data-theme="dark"] .section2Size{
+  background-color: #0E0C20;
+}
+
+[data-theme="dark"] .modalSize{
+  background-color: #7D7B9B;
+}
+
+[data-theme="dark"] .modalSize:hover{
+  background-color: #615E8D;
 }

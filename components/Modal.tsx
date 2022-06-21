@@ -5,7 +5,7 @@ const Modal = (modalObj: modalObject) => {
     const objectData = modalObj;
 
     return (
-        <div className='flex flex-col justify-evenly items-center modalSize bg-white'>
+        <div className='flex flex-col justify-evenly items-center modalSize'>
             <div className='imgDiv'>
                 <img src={objectData.image} className="imgConfig" />
             </div>
