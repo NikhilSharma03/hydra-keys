@@ -1,23 +1,21 @@
 import { useWallet } from '@solana/wallet-adapter-react'
-import { PublicKey } from '@solana/web3.js'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import useSWR from 'swr'
 import WalletsList from '../../components/WalletsList'
 
-const fetcher = (pubkey: PublicKey) => {
-  if (pubkey !== null) {
-    return fetch(`/api/wallets/user/${pubkey.toBase58()}`).then((res) =>
-      res.json()
-    )
+const fetcher = (key: string) => {
+  if (key) {
+    return fetch(key).then((res) => res.json())
   }
 }
 
 const Manage: NextPage = () => {
   const { publicKey, connected } = useWallet()
   const router = useRouter()
-  const { data, error } = useSWR(publicKey, fetcher)
+  const endpoint = publicKey ? `/api/wallets/user/${publicKey.toBase58()}` : ''
+  const { data, error } = useSWR(endpoint, fetcher)
 
   useEffect(() => {
     if (router.isReady && !connected) {
