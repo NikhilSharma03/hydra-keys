@@ -1,14 +1,21 @@
-import {FaBalanceScaleLeft, FaCog, FaEdit, FaRegEdit, FaUserPlus, FaUsers} from 'react-icons/fa'
-import AddMemberModal from "./AddMemberModal";
-import EditSPLToken from "./EditSPLToken";
-import {useState} from "react";
+import {
+  FaBalanceScaleLeft,
+  FaCog,
+  FaEdit,
+  FaRegEdit,
+  FaUserPlus,
+  FaUsers,
+} from 'react-icons/fa'
+import AddMemberModal from './AddMemberModal'
+import EditSPLToken from './EditSPLToken'
+import { useState } from 'react'
 
 type WalletDetailsProps = {
   wallet: any
 }
 
 const WalletDetails = ({ wallet }: WalletDetailsProps) => {
-  const [showUpdateSPL, setShowUpdateSPL] = useState(false);
+  const [showUpdateSPL, setShowUpdateSPL] = useState(false)
 
   const toggleUpdateSPL = () => {
     setShowUpdateSPL(!showUpdateSPL)
@@ -24,18 +31,15 @@ const WalletDetails = ({ wallet }: WalletDetailsProps) => {
           <span className="break-words">{wallet.pubKey}</span>
         </div>
 
-        <div
-          className=" w-full md:w-1/3 flex justify-center md:justify-end"
-        >
+        <div className=" w-full md:w-1/3 flex justify-center md:justify-end">
           <div className="tooltip tooltip-secondary" data-tip="Add members">
             <label
-                htmlFor="add-member-modal"
-                className="bg-secondary cursor-pointer h-12 w-12 flex hover:brightness-90 justify-center items-center rounded-lg"
+              htmlFor="add-member-modal"
+              className="bg-secondary cursor-pointer h-12 w-12 flex hover:brightness-90 justify-center items-center rounded-lg"
             >
               <FaUserPlus className="text-white text-xl" />
             </label>
           </div>
-
         </div>
       </div>
 
@@ -85,7 +89,17 @@ const WalletDetails = ({ wallet }: WalletDetailsProps) => {
           <div className="flex justify-between w-full md:w-1/3">
             <p>Accept SPL token: </p>
             <div className="text-primary">
-              {wallet.acceptSPL ? <span>Accept</span> : <div className="flex gap-10">No <FaRegEdit onClick={toggleUpdateSPL} className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${showUpdateSPL ? 'hidden' : 'inline'}`}/> </div>}
+              {wallet.acceptSPL ? <span>Accept</span> : (
+                <div className="flex gap-10">
+                  No
+                  <FaRegEdit
+                    onClick={toggleUpdateSPL}
+                    className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${
+                      showUpdateSPL ? 'hidden' : 'inline'
+                    }`}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -95,15 +109,13 @@ const WalletDetails = ({ wallet }: WalletDetailsProps) => {
               <p className="text-primary break-words"> {wallet.pubKeySPL}</p>
             </div>
           ) : null}
-
-          <div className={`w-full ${showUpdateSPL ? 'block' : 'hidden'}`}>
-            <EditSPLToken/>
-          </div>
         </div>
-
+        <div className={`w-full ${showUpdateSPL ? 'block' : 'hidden'}`}>
+          <EditSPLToken onCancel={toggleUpdateSPL}/>
+        </div>
       </div>
 
-      <AddMemberModal/>
+      <AddMemberModal />
     </div>
   )
 }

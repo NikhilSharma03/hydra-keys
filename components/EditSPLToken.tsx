@@ -6,7 +6,11 @@ interface FormValues {
   pubKeySPL: string
 }
 
-const EditSPLToken = () => {
+interface Props {
+  onCancel: Function;
+}
+
+const EditSPLToken = ({onCancel}: Props) => {
   let toggleRef = useRef<HTMLInputElement>(null)
 
   const initialValues = {
@@ -15,6 +19,7 @@ const EditSPLToken = () => {
   }
 
   const onSubmit = (values: any) => {
+    console.log('submitted')
     // add the SPL token here
     toggleRef.current!.checked = false
   }
@@ -57,19 +62,22 @@ const EditSPLToken = () => {
                 Enter SPL token public key
               </span>
             </label>
-            <input
-              type="text"
-              id="pubKeySPL"
-              placeholder="Enter a public key"
-              className="input input-bordered w-2/3"
-              disabled={!formik.values.acceptSPL}
-              {...formik.getFieldProps('pubKeySPL')}
-            />
-            {formik.errors.pubKeySPL &&
-            formik.touched.pubKeySPL &&
-            formik.values.acceptSPL ? (
-              <div className="text-red-500">{formik.errors.pubKeySPL}</div>
-            ) : null}
+            <div className="w-2/3 flex flex-col">
+              <input
+                  type="text"
+                  id="pubKeySPL"
+                  placeholder="Enter a public key"
+                  className="input input-bordered"
+                  disabled={!formik.values.acceptSPL}
+                  {...formik.getFieldProps('pubKeySPL')}
+              />
+
+              {formik.errors.pubKeySPL &&
+              formik.touched.pubKeySPL &&
+              formik.values.acceptSPL ? (
+                  <div className="text-red-500 -mb-4">{formik.errors.pubKeySPL}</div>
+              ) : null}
+            </div>
           </div>
         </div>
 
@@ -78,7 +86,7 @@ const EditSPLToken = () => {
             Update
           </button>
 
-          <button className="btn">Cancel</button>
+          <button className="btn" onClick={(e) => {onCancel()}}> Cancel</button>
         </div>
       </form>
     </div>
