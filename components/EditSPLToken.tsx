@@ -1,5 +1,4 @@
 import { FormikErrors, useFormik } from 'formik'
-import { useRef } from 'react'
 
 interface FormValues {
   acceptSPL: boolean
@@ -11,8 +10,6 @@ interface Props {
 }
 
 const EditSPLToken = ({onCancel}: Props) => {
-  let toggleRef = useRef<HTMLInputElement>(null)
-
   const initialValues = {
     acceptSPL: false,
     pubKeySPL: '',
@@ -21,7 +18,6 @@ const EditSPLToken = ({onCancel}: Props) => {
   const onSubmit = (values: any) => {
     console.log('submitted')
     // add the SPL token here
-    toggleRef.current!.checked = false
   }
 
   const validate = (values: any) => {
@@ -43,8 +39,8 @@ const EditSPLToken = ({onCancel}: Props) => {
   return (
     <div className="w-full">
       <form onSubmit={formik.handleSubmit} className="flex flex-col gap-5">
-        <div className="flex justify-between items-center">
-          <label className="cursor-pointer flex gap-3">
+        <div className="flex flex-col sm:flex-row justify-between items-center">
+          <label className="cursor-pointer flex gap-3 w-full md:w-1/2">
             <input
               type="checkbox"
               id="acceptSPL"
@@ -54,7 +50,7 @@ const EditSPLToken = ({onCancel}: Props) => {
             <span>Accept SPL Tokens</span>
           </label>
 
-          <div className="w-1/2 flex gap-3 justify-end">
+          <div className="w-full sm:w-1/2 flex flex-col md:flex-row gap-3 justify-end">
             <label className="label">
               <span
                 className={!formik.values.acceptSPL ? 'opacity-40' : undefined}
@@ -62,7 +58,7 @@ const EditSPLToken = ({onCancel}: Props) => {
                 Enter SPL token public key
               </span>
             </label>
-            <div className="w-2/3 flex flex-col">
+            <div className="w-full md:w-2/3 flex flex-col">
               <input
                   type="text"
                   id="pubKeySPL"
