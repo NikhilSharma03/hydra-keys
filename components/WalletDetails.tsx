@@ -12,7 +12,6 @@ import styles from '../styles/MemembersList.module.css'
 import { useState } from 'react'
 
 
-
 type WalletDetailsProps = {
   initialWallet: any
 }
