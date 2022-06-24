@@ -14,7 +14,6 @@ import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
 import {useState} from "react";
 
-
 type WalletDetailsProps = {
   initialWallet: any
   members: any

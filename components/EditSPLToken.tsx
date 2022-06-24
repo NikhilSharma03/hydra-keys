@@ -4,6 +4,7 @@ import { FanoutClient, Wallet } from '@glasseaters/hydra-sdk'
 import { useAnchorWallet } from '@solana/wallet-adapter-react'
 import {useRef, useState} from 'react'
 
+
 interface FormValues {
   acceptSPL: boolean
   pubKeySPL: string
@@ -40,6 +41,7 @@ const EditSPLToken = ({ onCancel, onSuccess, hydraPubKey }: Props) => {
       .then((r) => onSuccess(values.pubKeySPL))
       .catch((e) => formik.setFieldError('pubKeySPL', 'An error has occurred'))
       .finally(() => setLoading(false))
+
   }
 
   const validate = (values: any) => {
@@ -68,13 +70,11 @@ const EditSPLToken = ({ onCancel, onSuccess, hydraPubKey }: Props) => {
   return (
     <div className="w-full">
       <form onSubmit={formik.handleSubmit} className="flex flex-col gap-5">
-        <span className="text-white">{formik.values.acceptSPL ? 'true' : 'false'}</span>
-        <div className="flex flex-col sm:flex-row justify-between items-center">
-          <label className="cursor-pointer flex gap-3 w-full md:w-1/2">
+        <div className="flex justify-between items-center">
+          <label className="cursor-pointer flex gap-3">
             <input
               type="checkbox"
               id="acceptSPL"
-              ref={checkboxRef}
               className="checkbox checkbox-primary"
               {...formik.getFieldProps('acceptSPL')}
             />
