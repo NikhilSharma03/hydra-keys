@@ -3,6 +3,7 @@ import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import useSWR from 'swr'
+import LoadingSpinner from '../../components/LoadingSpinner'
 import WalletsList from '../../components/WalletsList'
 
 const fetcher = (key: string) => {
@@ -32,7 +33,11 @@ const Manage: NextPage = () => {
   }
 
   if (!data) {
-    return <p className="text-center">Loading...</p>
+    return (
+      <div className="flex flex-row justify-center items-center">
+        <LoadingSpinner />
+      </div>
+    )
   }
 
   return (
