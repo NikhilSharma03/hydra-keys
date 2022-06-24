@@ -3,6 +3,7 @@ import AddMemberModal from "./AddMemberModal";
 import EditSPLToken from "./EditSPLToken";
 import MembersTable from "./MembersTable";
 import styles from '../styles/MemembersList.module.css'
+import {useState} from "react";
 
 
 type WalletDetailsProps = {
@@ -10,6 +11,12 @@ type WalletDetailsProps = {
 }
 
 const WalletDetails = ({ wallet }: WalletDetailsProps) => {
+  const [showUpdateSPL, setShowUpdateSPL] = useState(false);
+
+  const toggleUpdateSPL = () => {
+    setShowUpdateSPL(!showUpdateSPL)
+  }
+
   return (
     <div className="w-full flex flex-col gap-8">
       <div className="flex justify-between flex-wrap gap-5 md:gap-0 pb-8">
@@ -81,9 +88,9 @@ const WalletDetails = ({ wallet }: WalletDetailsProps) => {
         <div className="flex w-full justify-between flex-wrap gap-y-5">
           <div className="flex justify-between w-full md:w-1/3">
             <p>Accept SPL token: </p>
-            <p className="text-primary">
-              {wallet.acceptSPL ? <span>Accept</span> : <div className="flex gap-10">No <FaRegEdit className="cursor-pointer opacity-80 hover:opacity-100 text-lg text-white"/> </div>}
-            </p>
+            <div className="text-primary">
+              {wallet.acceptSPL ? <span>Accept</span> : <div className="flex gap-10">No <FaRegEdit onClick={toggleUpdateSPL} className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${showUpdateSPL ? 'hidden' : 'inline'}`}/> </div>}
+            </div>
           </div>
 
           {wallet.acceptSPL ? (
@@ -92,9 +99,12 @@ const WalletDetails = ({ wallet }: WalletDetailsProps) => {
               <p className="text-primary break-words"> {wallet.pubKeySPL}</p>
             </div>
           ) : null}
+
+          <div className={`w-full ${showUpdateSPL ? 'block' : 'hidden'}`}>
+            <EditSPLToken/>
+          </div>
         </div>
 
-        <EditSPLToken/>
       </div>
 
       <AddMemberModal />

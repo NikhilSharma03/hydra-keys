@@ -8,6 +8,9 @@ module.exports = {
       fontFamily: {
         nunito: ['Nunito', 'sans-serif'],
       },
+      transitionProperty: {
+        'max-height': 'max-height'
+      },
     },
   },
   darkMode: 'class',
