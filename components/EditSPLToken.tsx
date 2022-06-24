@@ -70,8 +70,8 @@ const EditSPLToken = ({ onCancel, onSuccess, hydraPubKey }: Props) => {
   return (
     <div className="w-full">
       <form onSubmit={formik.handleSubmit} className="flex flex-col gap-5">
-        <div className="flex justify-between items-center">
-          <label className="cursor-pointer flex gap-3">
+        <div className="flex flex-col sm:flex-row justify-between items-center">
+          <label className="cursor-pointer flex gap-3 w-full md:w-1/2">
             <input
               type="checkbox"
               id="acceptSPL"
