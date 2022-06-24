@@ -142,7 +142,6 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
           ) : null}
         </div>
 
-
         <div className={`w-full ${showUpdateSPL ? 'block' : 'hidden'}`}>
           <EditSPLToken onCancel={toggleUpdateSPL} onSuccess={updateWallet} hydraPubKey={wallet.pubKey}/>
         </div>
