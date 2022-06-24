@@ -1,9 +1,17 @@
-import {FaBalanceScaleLeft, FaCog, FaEdit, FaRegEdit, FaUserPlus, FaUsers} from 'react-icons/fa'
-import AddMemberModal from "./AddMemberModal";
-import EditSPLToken from "./EditSPLToken";
+import {
+  FaBalanceScaleLeft,
+  FaCog,
+  FaEdit,
+  FaRegEdit,
+  FaUserPlus,
+  FaUsers,
+} from 'react-icons/fa'
+import AddMemberModal from './AddMemberModal'
+import EditSPLToken from './EditSPLToken'
 import MembersTable from "./MembersTable";
 import styles from '../styles/MemembersList.module.css'
-import {useState} from "react";
+import { useState } from 'react'
+
 
 
 type WalletDetailsProps = {
@@ -11,7 +19,7 @@ type WalletDetailsProps = {
 }
 
 const WalletDetails = ({ wallet }: WalletDetailsProps) => {
-  const [showUpdateSPL, setShowUpdateSPL] = useState(false);
+  const [showUpdateSPL, setShowUpdateSPL] = useState(false)
 
   const toggleUpdateSPL = () => {
     setShowUpdateSPL(!showUpdateSPL)
@@ -89,7 +97,17 @@ const WalletDetails = ({ wallet }: WalletDetailsProps) => {
           <div className="flex justify-between w-full md:w-1/3">
             <p>Accept SPL token: </p>
             <div className="text-primary">
-              {wallet.acceptSPL ? <span>Accept</span> : <div className="flex gap-10">No <FaRegEdit onClick={toggleUpdateSPL} className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${showUpdateSPL ? 'hidden' : 'inline'}`}/> </div>}
+              {wallet.acceptSPL ? <span>Accept</span> : (
+                <div className="flex gap-10">
+                  No
+                  <FaRegEdit
+                    onClick={toggleUpdateSPL}
+                    className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${
+                      showUpdateSPL ? 'hidden' : 'inline'
+                    }`}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -99,12 +117,10 @@ const WalletDetails = ({ wallet }: WalletDetailsProps) => {
               <p className="text-primary break-words"> {wallet.pubKeySPL}</p>
             </div>
           ) : null}
-
-          <div className={`w-full ${showUpdateSPL ? 'block' : 'hidden'}`}>
-            <EditSPLToken/>
-          </div>
         </div>
-
+        <div className={`w-full ${showUpdateSPL ? 'block' : 'hidden'}`}>
+          <EditSPLToken onCancel={toggleUpdateSPL}/>
+        </div>
       </div>
 
       <AddMemberModal />
