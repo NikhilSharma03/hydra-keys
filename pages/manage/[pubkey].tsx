@@ -10,7 +10,7 @@ import { useRouter } from 'next/router'
 const fetcher = (key: string) => {
   if (key) {
     return fetch(key).then((res) => res.json())
-  }
+ }
 }
 
 const WalletDetailsPage: NextPage = () => {
