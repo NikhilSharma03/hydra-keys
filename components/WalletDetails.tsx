@@ -140,7 +140,6 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
               <p className="text-primary break-words"> {wallet.splToken}</p>
             </div>
           ) : null}
-
         </div>
 
 
