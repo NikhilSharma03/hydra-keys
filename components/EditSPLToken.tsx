@@ -10,6 +10,7 @@ import { useAnchorWallet } from '@solana/wallet-adapter-react'
 import { useRef, useState } from 'react'
 import { isValidPubKey } from '../utils/utils'
 
+
 interface FormValues {
   acceptSPL: boolean
   pubKeySPL: string
