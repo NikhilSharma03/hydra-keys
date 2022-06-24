@@ -41,8 +41,8 @@ export const getServerSideProps = async (context: any) => {
     authority: 'D4QYC...ioi',
     shares: 100,
     model: 'Wallet membership',
-    acceptSPL: true,
-    pubKeySPL: '2msQ3eha1rvhSuwCPJ213oVgwtu3FSgxBXS6RPrzsDWB',
+    acceptSPL: false,
+    pubKeySPL: null,
   }
   return {
     props: { wallet: wallet },
