@@ -1,3 +1,7 @@
+.walletBtnParent {
+  @apply hidden sm:flex flex-row items-center gap-2;
+}
+
 .walletBtnParent button {
-  @apply btn btn-primary hidden sm:inline-flex;
+  @apply btn btn-primary;
 }

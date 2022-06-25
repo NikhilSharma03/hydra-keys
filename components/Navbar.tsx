@@ -7,6 +7,7 @@ import ThemeToggle from './ThemeToggle'
 import styles from '../styles/Navbar.module.css'
 import { useAppDispatch } from '../hooks/useAppDispatch'
 import { toggleSidebar } from '../redux/features/sidebar/sidebarSlice'
+import ClusterPicker from './ClusterPicker'
 
 type NavbarProps = {
   drawerId: string
@@ -30,7 +31,9 @@ const Navbar = ({ drawerId }: NavbarProps) => {
         </Link>
         <Link href="/">
           <a>
-            <h1 className="hidden md:block text-lg font-bold dark:text-[#F9F8F8]">Hydra Wallet</h1>
+            <h1 className="hidden md:block text-lg font-bold dark:text-[#F9F8F8]">
+              Hydra Wallet
+            </h1>
           </a>
         </Link>
       </div>
@@ -41,6 +44,7 @@ const Navbar = ({ drawerId }: NavbarProps) => {
         </div>
         <ThemeToggle />
         <div className={styles.walletBtnParent}>
+          <ClusterPicker />
           <WalletMultiButton />
         </div>
         <label
