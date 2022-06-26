@@ -24,9 +24,11 @@ const ClusterPickerItem = ({
 
   return (
     <a
-      className={`${cluster === value ? activeClass ?? 'bg-primary' : ''} ${
-        className ?? ''
-      }`}
+      className={`${
+        cluster === value
+          ? activeClass ?? 'bg-primary text-primary-content'
+          : ''
+      } ${className ?? ''}`}
       onClick={() => dispatch(changeCluster(value))}
     >
       {text}

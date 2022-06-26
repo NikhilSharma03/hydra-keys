@@ -85,13 +85,13 @@ const Layout = ({ children }: LayoutProps) => {
                       <ClusterPickerItem
                         text="Devnet"
                         value="devnet"
-                        activeClass="bg-secondary"
+                        activeClass="bg-secondary text-secondary-content"
                         className="btn btn-ghost flex-1"
                       />
                       <ClusterPickerItem
                         text="Mainnet"
                         value="mainnet-beta"
-                        activeClass="bg-secondary"
+                        activeClass="bg-secondary text-secondary-content"
                         className="btn btn-ghost flex-1"
                       />
                     </div>
