@@ -451,17 +451,6 @@
     "buffer-layout" "^1.2.0"
     "dotenv" "8.2.0"
 
-"@solana/spl-token@0.1.4":
-  "integrity" "sha512-W8uSC4ysWVjbKK7lvsIHFxdMIkOCEoOm9tYY9VVpBlUIp4+K5bpPxHXUlxMiHfkKPWAxab6IGUn71VVLg8uq5Q=="
-  "resolved" "https://registry.npmjs.org/@solana/spl-token/-/spl-token-0.1.4.tgz"
-  "version" "0.1.4"
-  dependencies:
-    "@babel/runtime" "^7.10.5"
-    "@solana/web3.js" "^1.9.1"
-    "bn.js" "^5.1.0"
-    "buffer" "6.0.3"
-    "buffer-layout" "^1.2.0"
-    "dotenv" "10.0.0"
 
 "@solana/spl-token@0.1.4":
   "integrity" "sha512-W8uSC4ysWVjbKK7lvsIHFxdMIkOCEoOm9tYY9VVpBlUIp4+K5bpPxHXUlxMiHfkKPWAxab6IGUn71VVLg8uq5Q=="
@@ -473,7 +462,7 @@
     "bn.js" "^5.1.0"
     "buffer" "6.0.3"
     "buffer-layout" "^1.2.0"
-    "dotenv" "8.2.0"
+    "dotenv" "10.0.0"
 
 "@solana/wallet-adapter-base@^0.9.3", "@solana/wallet-adapter-base@^0.9.4", "@solana/wallet-adapter-base@^0.9.5":
   "integrity" "sha512-KCrSB2s8lA38Bd+aPvHlwPEHZU1owD6LSCikjumUaR3HCcpv+V1lxgQX+tdNaDyEVTKlAYNd0uJU+yQfQlkiOA=="
@@ -732,20 +721,6 @@
     "localstorage-memory" "^1.0.3"
     "superstruct" "0.14.2"
     "tweetnacl" "^1.0.3"
-
-"@strata-foundation/spl-utils@^3.8.2":
-  "integrity" "sha512-5sb40pm2GhLWg/7Q3815oDagZBqwOgbNU4RVM0bK29oI+sUFaFGv/2brlTDhxatP71nw8oiZZKgRuocT4e7IYQ=="
-  "resolved" "https://registry.npmjs.org/@strata-foundation/spl-utils/-/spl-utils-3.8.2.tgz"
-  "version" "3.8.2"
-  dependencies:
-    "@metaplex-foundation/mpl-token-metadata" "^1.1.0"
-    "@metaplex/arweave-cost" "1.0.4"
-    "@metaplex/js" "^4.3.0"
-    "@solana/spl-name-service" "^0.1.3"
-    "@solana/web3.js" "^1.32.0"
-    "bs58" "^4.0.1"
-    "eventemitter3" "^4.0.7"
-    "uuid" "^8.3.2"
 
 "@strata-foundation/spl-utils@^3.8.2":
   "integrity" "sha512-5sb40pm2GhLWg/7Q3815oDagZBqwOgbNU4RVM0bK29oI+sUFaFGv/2brlTDhxatP71nw8oiZZKgRuocT4e7IYQ=="
@@ -1756,16 +1731,6 @@
   dependencies:
     "delayed-stream" "~1.0.0"
 
-"commander@^2.20.3":
-  "integrity" "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ=="
-  "resolved" "https://registry.npmjs.org/commander/-/commander-2.20.3.tgz"
-  "version" "2.20.3"
-
-"concat-map@0.0.1":
-  "integrity" "sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg=="
-  "resolved" "https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz"
-  "version" "0.0.1"
-
 "core-js-pure@^3.20.2":
   "integrity" "sha512-t6u7H4Ff/yZNk+zqTr74UjCcZ3k8ApBryeLLV4rYQd9aF3gqmjjGjjR44ENfeBMH8VVvSynIjAJ0mUuFhzQtrA=="
   "resolved" "https://registry.npmjs.org/core-js-pure/-/core-js-pure-3.23.2.tgz"
@@ -2146,19 +2111,6 @@
   "integrity" "sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q=="
   "resolved" "https://registry.npmjs.org/dotenv/-/dotenv-10.0.0.tgz"
   "version" "10.0.0"
-
-"dotenv@8.2.0":
-  "integrity" "sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw=="
-  "resolved" "https://registry.npmjs.org/dotenv/-/dotenv-8.2.0.tgz"
-  "version" "8.2.0"
-
-"drbg.js@^1.0.1":
-  "integrity" "sha512-F4wZ06PvqxYLFEZKkFxTDcns9oFNk34hvmJSEwdzsxVQ8YI5YaxtACgQatkYgv2VI2CFkUd2Y+xosPQnHv809g=="
-  "resolved" "https://registry.npmjs.org/drbg.js/-/drbg.js-1.0.1.tgz"
-  "version" "1.0.1"
-  dependencies:
-    "no-case" "^3.0.4"
-    "tslib" "^2.0.3"
 
 "dotenv@10.0.0":
   "integrity" "sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q=="
