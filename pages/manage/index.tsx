@@ -14,7 +14,6 @@ const Manage: NextPage = () => {
     }
   }, [router, connected])
 
-
   return (
     <div className="container mx-auto pt-8 px-6 flex flex-col justify-start items-start">
       <h1 className="text-2xl font-extrabold font-['Nunito',sans-serif]">Your Hydra Wallets</h1>
