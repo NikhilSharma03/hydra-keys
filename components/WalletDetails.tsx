@@ -16,15 +16,24 @@ import {useState} from "react";
 
 
 type WalletDetailsProps = {
-  wallet: any
+  initialWallet: any
   members: any
 }
 
-const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
-  const [showUpdateSPL, setShowUpdateSPL] = useState(false);
+const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
+  const [showUpdateSPL, setShowUpdateSPL] = useState(false)
+  const [wallet, setWallet] = useState(initialWallet)
 
   const toggleUpdateSPL = () => {
     setShowUpdateSPL(!showUpdateSPL)
+  }
+
+  const updateWallet = (pubKeySPL) => {
+    toggleUpdateSPL()
+    const newWallet = {...wallet}
+    newWallet.acceptSPL = true
+    newWallet.pubKeySPL = pubKeySPL
+    setWallet(newWallet)
   }
 
   return (
@@ -134,7 +143,7 @@ const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
           ) : null}
         </div>
         <div className={`w-full ${showUpdateSPL ? 'block' : 'hidden'}`}>
-          <EditSPLToken onCancel={toggleUpdateSPL} hydraPubKey={wallet.pubKey}/>
+          <EditSPLToken onCancel={toggleUpdateSPL} onSuccess={updateWallet} hydraPubKey={wallet.pubKey}/>
         </div>
       </div>
 

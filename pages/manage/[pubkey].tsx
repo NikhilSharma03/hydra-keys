@@ -38,7 +38,7 @@ const WalletDetailsPage: NextPage = () => {
   return (
     <div className="container mx-auto px-6 sm:px-0 gap-10 flex flex-col justify-center items-center my-10">
       <WalletDetails
-        wallet={data.found ? data.wallet : {}}
+        initialWallet={data.found ? data.wallet : {}}
         members={data.found ? data.members : []}
       />
     </div>
