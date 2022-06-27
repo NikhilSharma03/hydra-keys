@@ -1,23 +1,21 @@
-import ClusterPickerItem from './ClusterPickerItem'
+import { Cluster } from "@solana/web3.js"
+import { useAppDispatch } from "../hooks/useAppDispatch"
+import { useAppSelector } from "../hooks/useAppSelector"
+import { changeCluster, selectCluster } from "../redux/features/wallet/walletSlice"
 
 const ClusterPicker = () => {
+  const cluster = useAppSelector(selectCluster)
+  const dispatch = useAppDispatch()
+
   return (
-    <div className="dropdown">
-      <label tabIndex={0} className="btn btn-secondary m-1 w-full">
-        Cluster
-      </label>
-      <ul
-        tabIndex={0}
-        className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 gap-2"
-      >
-        <li>
-          <ClusterPickerItem text="Devnet" value="devnet" />
-        </li>
-        <li>
-          <ClusterPickerItem text="Mainnet" value="mainnet-beta" />
-        </li>
-      </ul>
-    </div>
+    <select
+      className="select select-primary"
+      value={cluster}
+      onChange={(e) => dispatch(changeCluster(e.target.value as Cluster))}
+    >
+      <option value="devnet">Devnet</option>
+      <option value="mainnet-beta">Mainnet</option>
+    </select>
   )
 }
 
