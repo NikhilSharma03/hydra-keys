@@ -5,6 +5,8 @@ import { useEffect } from 'react'
 import useSWR from 'swr'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import WalletsList from '../../components/WalletsList'
+import { useAppSelector } from '../../hooks/useAppSelector'
+import { selectCluster } from '../../redux/features/wallet/walletSlice'
 
 const fetcher = (key: string) => {
   if (key) {
@@ -15,7 +17,10 @@ const fetcher = (key: string) => {
 const Manage: NextPage = () => {
   const { publicKey, connected } = useWallet()
   const router = useRouter()
-  const endpoint = publicKey ? `/api/wallets/user/${publicKey.toBase58()}` : ''
+  const cluster = useAppSelector(selectCluster)
+  const endpoint = publicKey
+    ? `/api/wallets/user/${publicKey.toBase58()}?cluster=${cluster}`
+    : ''
   const { data, error } = useSWR(endpoint, fetcher)
 
   useEffect(() => {
