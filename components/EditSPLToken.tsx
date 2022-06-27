@@ -11,10 +11,11 @@ interface FormValues {
 
 interface Props {
   onCancel: Function
+  onSuccess: Function
   hydraPubKey: string
 }
 
-const EditSPLToken = ({ onCancel, hydraPubKey }: Props) => {
+const EditSPLToken = ({ onCancel, onSuccess, hydraPubKey }: Props) => {
   let checkboxRef = useRef<HTMLInputElement>(null)
 
   const [loading, setLoading] = useState(false)
@@ -36,7 +37,7 @@ const EditSPLToken = ({ onCancel, hydraPubKey }: Props) => {
         fanout: new PublicKey(hydraPubKey),
         mint: new PublicKey(values.pubKeySPL),
       })
-      .then((r) => console.log(r))
+      .then((r) => onSuccess(values.pubKeySPL))
       .catch((e) => formik.setFieldError('pubKeySPL', 'An error has occurred'))
       .finally(() => setLoading(false))
   }
