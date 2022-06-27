@@ -22,7 +22,6 @@ interface Props {
 }
 
 const EditSPLToken = ({ onCancel, onSuccess, hydraPubKey }: Props) => {
-
   let checkboxRef = useRef<HTMLInputElement>(null)
 
   const [loading, setLoading] = useState(false)
