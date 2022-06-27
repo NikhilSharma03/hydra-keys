@@ -27,7 +27,7 @@ interface Props {
 const WalletDetailsPage: NextPage<Props> = ({ wallet }) => {
   return (
     <div className="container mx-auto px-6 sm:px-0 gap-10 flex flex-col justify-center items-center my-10">
-      <WalletDetails wallet={wallet} />
+      <WalletDetails initialWallet={wallet} />
     </div>
   )
 }
