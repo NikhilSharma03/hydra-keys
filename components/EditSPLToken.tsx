@@ -22,6 +22,7 @@ interface Props {
 }
 
 const EditSPLToken = ({ onCancel, onSuccess, hydraPubKey }: Props) => {
+
   let checkboxRef = useRef<HTMLInputElement>(null)
 
   const [loading, setLoading] = useState(false)
@@ -82,6 +83,7 @@ const EditSPLToken = ({ onCancel, onSuccess, hydraPubKey }: Props) => {
   return (
     <div className="w-full">
       <form onSubmit={formik.handleSubmit} className="flex flex-col gap-5">
+        <span className="text-white">{formik.values.acceptSPL ? 'true' : 'false'}</span>
         <div className="flex flex-col sm:flex-row justify-between items-center">
           <label className="cursor-pointer flex gap-3 w-full md:w-1/2">
             <input

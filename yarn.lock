@@ -427,16 +427,6 @@
     "bn.js" "^5.1.3"
     "borsh" "^0.4.0"
 
-"@solana/spl-name-service@^0.1.3":
-  "integrity" "sha512-/ndRogwcY5JZU5JU5X7PA55wHJexGYJnUw2O/lqncbo4A7fnNcECAG6oXtGrU2MoCYLBBXXsatb3iC1JKNIo8Q=="
-  "resolved" "https://registry.npmjs.org/@solana/spl-name-service/-/spl-name-service-0.1.4.tgz"
-  "version" "0.1.4"
-  dependencies:
-    "@solana/spl-token" "0.1.4"
-    "@solana/web3.js" "^1.11.0"
-    "bn.js" "^5.1.3"
-    "borsh" "^0.4.0"
-
 "@solana/spl-token@^0.1.6", "@solana/spl-token@^0.1.8":
   "integrity" "sha512-LZmYCKcPQDtJgecvWOgT/cnoIQPWjdH+QVyzPcFvyDUiT0DiRjZaam4aqNUyvchLFhzgunv3d9xOoyE34ofdoQ=="
   "resolved" "https://registry.npmjs.org/@solana/spl-token/-/spl-token-0.1.8.tgz"
@@ -2784,9 +2774,6 @@ glob@^7.1.3, glob@^7.2.0:
   integrity sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==
   dependencies:
     "is-glob" "^4.0.1"
-
-"glob@^7.1.3", "glob@^7.2.0":
-=======
     "deepmerge" "^2.1.1"
     "hoist-non-react-statics" "^3.3.0"
     "lodash" "^4.17.21"
@@ -2881,7 +2868,6 @@ glob@^7.1.3, glob@^7.2.0:
     "path-is-absolute" "^1.0.0"
 
 "glob@^7.2.0":
->>>>>>> 0e6bf33 (fix conflicts)
   "integrity" "sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q=="
   "resolved" "https://registry.npmjs.org/glob/-/glob-7.2.3.tgz"
   "version" "7.2.3"
@@ -2893,7 +2879,7 @@ glob@^7.1.3, glob@^7.2.0:
     "once" "^1.3.0"
     "path-is-absolute" "^1.0.0"
 
-"glob@7.1.7":
+"glob@^7.1.3", "glob@7.1.7":
   "integrity" "sha512-OvD9ENzPLbegENnYP5UUfJIirTg4+XwMWGaQfQTY0JenxNvvIKP3U3/tAQSPIu/lHxXYSZmpXlUHeqAIdKzBLQ=="
   "resolved" "https://registry.npmjs.org/glob/-/glob-7.1.7.tgz"
   "version" "7.1.7"
@@ -2902,6 +2888,18 @@ glob@^7.1.3, glob@^7.2.0:
     "inflight" "^1.0.4"
     "inherits" "2"
     "minimatch" "^3.0.4"
+    "once" "^1.3.0"
+    "path-is-absolute" "^1.0.0"
+
+"glob@^7.2.0":
+  "integrity" "sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q=="
+  "resolved" "https://registry.npmjs.org/glob/-/glob-7.2.3.tgz"
+  "version" "7.2.3"
+  dependencies:
+    "fs.realpath" "^1.0.0"
+    "inflight" "^1.0.4"
+    "inherits" "2"
+    "minimatch" "^3.1.1"
     "once" "^1.3.0"
     "path-is-absolute" "^1.0.0"
 
