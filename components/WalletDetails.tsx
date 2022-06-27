@@ -1,7 +1,6 @@
 import {
   FaBalanceScaleLeft,
   FaCog,
-  FaEdit,
   FaRegEdit,
   FaUserPlus,
   FaUsers,
@@ -119,7 +118,7 @@ const WalletDetails = ({ wallet }: WalletDetailsProps) => {
           ) : null}
         </div>
         <div className={`w-full ${showUpdateSPL ? 'block' : 'hidden'}`}>
-          <EditSPLToken onCancel={toggleUpdateSPL}/>
+          <EditSPLToken onCancel={toggleUpdateSPL} hydraPubKey={wallet.pubKey}/>
         </div>
       </div>
 
