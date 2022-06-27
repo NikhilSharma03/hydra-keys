@@ -126,7 +126,11 @@ const WalletDetails = ({ initialWallet }: WalletDetailsProps) => {
         </div>
 
         <div className={`w-full ${showUpdateSPL ? 'block' : 'hidden'}`}>
+<<<<<<< HEAD
           <EditSPLToken onCancel={toggleUpdateSPL} onSuccess={updateWallet} hydraPubKey={wallet.pubKey}/>
+=======
+          <EditSPLToken onCancel={toggleUpdateSPL} hydraPubKey={wallet.pubKey}/>
+>>>>>>> b790016 (reset at cancel and accept SPL functionality)
         </div>
       </div>
 
