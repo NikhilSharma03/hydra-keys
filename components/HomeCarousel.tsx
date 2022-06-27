@@ -53,8 +53,8 @@ const HomeCarousel = () => {
                 <h1>Wallet Membership</h1><br/>
                 <p className="description">
                   {' '}
-                  One of the simplest membership model. It's just a list of each
-                  Member's public address and the number of shares they own.
+                  One of the simplest membership model. It&apos;s just a list of each
+                  Member&apos;s public address and the number of shares they own.
                 </p>
               </div>
               <div className="descriptions__item">
@@ -80,8 +80,8 @@ const HomeCarousel = () => {
                 <h1>Wallet Membership</h1><br/>
                 <p className="description">
                   {' '}
-                  One of the simplest membership model. It's just a list of each
-                  Member's public address and the number of shares they own.
+                  One of the simplest membership model. It&apos;s just a list of each
+                  Member&apos;s public address and the number of shares they own.
                 </p>
               </div>
               <div className="descriptions__item">
@@ -115,8 +115,8 @@ const HomeCarousel = () => {
                 <h1>Wallet Membership</h1><br/>
                 <p className="description">
                   {' '}
-                  One of the simplest membership model. It's just a list of each
-                  Member's public address and the number of shares they own.
+                  One of the simplest membership model. It&apos;s just a list of each
+                  Member&apos;s public address and the number of shares they own.
                 </p>
               </div>
               </div>
