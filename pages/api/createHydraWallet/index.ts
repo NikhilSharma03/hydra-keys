@@ -2,6 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { PrismaClient } from '@prisma/client'
 import { clusterApiUrl, Connection } from '@solana/web3.js'
+import { SplTokenMetadata } from '@strata-foundation/spl-utils'
 
 const prisma = new PrismaClient()
 
@@ -25,6 +26,7 @@ export default async function handler(
       authority,
       memberShipType,
       acceptSPL,
+      splToken,
       totalShares,
       cluster,
     } = req.body
@@ -43,7 +45,7 @@ export default async function handler(
           authority: authority,
           memberShipType: memberShipType,
           acceptSPL: acceptSPL,
-          // TODO: Include SPL token public key
+          splToken: splToken,
           // TODO: Include mint public key for Token membership model
           totalShares: totalShares,
           cluster: cluster,
