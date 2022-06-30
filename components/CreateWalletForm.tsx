@@ -1,4 +1,5 @@
 import { FormikErrors, useFormik } from 'formik'
+import { isValidPubKey } from '../utils/utils'
 
 interface FormValues {
   name: string
@@ -33,9 +34,12 @@ const CreateWalletForm = () => {
       errors.shares = 'Enter a valid number of shares'
     }
 
-    if (values.acceptSPL && !values.pubKeySPL) {
-      errors.pubKeySPL = 'This field is required'
-    }
+    if (values.acceptSPL)
+      values.pubKeySPL
+        ? isValidPubKey(values.pubKeySPL)
+          ? (errors.pubKeySPL = 'Please enter a valid public key')
+          : null
+        : (errors.pubKeySPL = 'This field is required')
 
     return errors
   }
@@ -127,9 +131,7 @@ const CreateWalletForm = () => {
 
           <label className="label">
             <span
-              className={
-                !formik.values.acceptSPL ? 'opacity-40' : undefined
-              }
+              className={!formik.values.acceptSPL ? 'opacity-40' : undefined}
             >
               Enter SPL token public key
             </span>
