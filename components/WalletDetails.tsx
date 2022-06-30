@@ -9,6 +9,7 @@ import AddMemberModal from './AddMemberModal'
 import EditSPLToken from './EditSPLToken'
 import MembersTable from "./MembersTable";
 import styles from '../styles/MemembersList.module.css'
+
 import { useState } from 'react'
 
 type WalletDetailsProps = {
