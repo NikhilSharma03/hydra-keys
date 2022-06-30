@@ -2,7 +2,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { PrismaClient } from '@prisma/client'
 import { clusterApiUrl, Connection } from '@solana/web3.js'
-import { SplTokenMetadata } from '@strata-foundation/spl-utils'
 
 const prisma = new PrismaClient()
 
@@ -36,6 +35,21 @@ export default async function handler(
 
     try {
       /* We may validate the parameters here or through middleware */
+      const existingWallet = await prisma.wallet.findFirst({
+        where: {
+          name: {
+            equals: name
+          }
+        }
+      })
+
+      if (existingWallet) {
+        throw {
+          response: {
+            msg: 'A wallet already exists with the same name',
+          },
+        }
+      }
 
       // Save wallet into database
       const savedWallet = await prisma.wallet.create({
