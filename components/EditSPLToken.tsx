@@ -1,8 +1,14 @@
 import { FormikErrors, useFormik } from 'formik'
-import { clusterApiUrl, Connection, PublicKey } from '@solana/web3.js'
+import {
+  clusterApiUrl,
+  Connection,
+  PublicKey,
+  Transaction,
+} from '@solana/web3.js'
 import { FanoutClient, Wallet } from '@glasseaters/hydra-sdk'
 import { useAnchorWallet } from '@solana/wallet-adapter-react'
-import {useRef, useState} from 'react'
+import { useRef, useState } from 'react'
+import { isValidPubKey } from '../utils/utils'
 
 interface FormValues {
   acceptSPL: boolean
@@ -22,32 +28,41 @@ const EditSPLToken = ({ onCancel, onSuccess, hydraPubKey }: Props) => {
 
   const connection = new Connection(clusterApiUrl('devnet'), 'confirmed')
 
-  const fanoutSdk = new FanoutClient(connection, useAnchorWallet() as Wallet)
+  const wallet = useAnchorWallet() as Wallet
+  const fanoutSdk = new FanoutClient(connection, wallet)
 
   const initialValues = {
     acceptSPL: false,
     pubKeySPL: '',
   }
 
-  const onSubmit = (values: any) => {
-    console.log('submitted')
+  const tx = new Transaction()
+
+  const onSubmit = async (values: any) => {
     setLoading(true)
-    fanoutSdk
-      .initializeFanoutForMint({
-        fanout: new PublicKey(hydraPubKey),
-        mint: new PublicKey(values.pubKeySPL),
-      })
-      .then((r) => onSuccess(values.pubKeySPL))
-      .catch((e) => formik.setFieldError('pubKeySPL', 'An error has occurred'))
-      .finally(() => setLoading(false))
+
+    const ixSPL = await fanoutSdk.initializeFanoutForMintInstructions({
+      fanout: new PublicKey(hydraPubKey),
+      mint: new PublicKey(values.pubKeySPL),
+    })
+    tx.add(...ixSPL.instructions)
+
+    tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+    tx.feePayer = wallet.publicKey
+    const txSigned = await wallet.signTransaction(tx)
+
+    // Call the API to add spl token
   }
 
   const validate = (values: any) => {
     let errors: FormikErrors<FormValues> = {}
 
-    if (values.acceptSPL && !values.pubKeySPL) {
-      errors.pubKeySPL = 'This field is required'
-    }
+    if (values.acceptSPL)
+      values.pubKeySPL
+        ? isValidPubKey(values.pubKeySPL)
+          ? (errors.pubKeySPL = 'Please enter a valid public key')
+          : null
+        : (errors.pubKeySPL = 'This field is required')
 
     return errors
   }
@@ -58,8 +73,7 @@ const EditSPLToken = ({ onCancel, onSuccess, hydraPubKey }: Props) => {
     validate,
   })
 
-
-  const resetAndCancel= () => {
+  const resetAndCancel = () => {
     formik.resetForm()
     checkboxRef.current!.checked = false
     onCancel()
@@ -68,7 +82,6 @@ const EditSPLToken = ({ onCancel, onSuccess, hydraPubKey }: Props) => {
   return (
     <div className="w-full">
       <form onSubmit={formik.handleSubmit} className="flex flex-col gap-5">
-        <span className="text-white">{formik.values.acceptSPL ? 'true' : 'false'}</span>
         <div className="flex flex-col sm:flex-row justify-between items-center">
           <label className="cursor-pointer flex gap-3 w-full md:w-1/2">
             <input
