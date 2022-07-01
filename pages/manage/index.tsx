@@ -1,11 +1,10 @@
 import { useWallet } from '@solana/wallet-adapter-react'
 import type { NextPage } from 'next'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import useSWR from 'swr'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import WalletsList from '../../components/WalletsList'
 import { useAppSelector } from '../../hooks/useAppSelector'
+import { useProtectRoute } from '../../hooks/useProtectRoute'
 import { selectCluster } from '../../redux/features/wallet/walletSlice'
 
 const fetcher = (key: string) => {
@@ -15,19 +14,14 @@ const fetcher = (key: string) => {
 }
 
 const Manage: NextPage = () => {
-  const { publicKey, connected } = useWallet()
-  const router = useRouter()
+  const { publicKey } = useWallet()
   const cluster = useAppSelector(selectCluster)
   const endpoint = publicKey
     ? `/api/wallets/user/${publicKey.toBase58()}?cluster=${cluster}`
     : ''
   const { data, error } = useSWR(endpoint, fetcher)
 
-  useEffect(() => {
-    if (router.isReady && !connected) {
-      router.replace('/')
-    }
-  }, [router, connected])
+  useProtectRoute()
 
   if (publicKey === null) {
     return <p className="text-center">Please connect your wallet</p>

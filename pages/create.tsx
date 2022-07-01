@@ -1,19 +1,10 @@
-import { useWallet } from '@solana/wallet-adapter-react'
 import type { NextPage } from 'next'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 
 import CreateWalletForm from '../components/CreateWalletForm'
+import { useProtectRoute } from '../hooks/useProtectRoute'
 
 const Create: NextPage = () => {
-  const { connected } = useWallet()
-  const router = useRouter()
-
-  useEffect(() => {
-    if (router.isReady && !connected) {
-      router.replace('/')
-    }
-  }, [router, connected])
+  useProtectRoute()
 
   return (
     <div className="container mx-auto gap-10 flex flex-col justify-center items-center my-10">
