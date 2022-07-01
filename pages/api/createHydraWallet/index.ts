@@ -35,21 +35,6 @@ export default async function handler(
 
     try {
       /* We may validate the parameters here or through middleware */
-      const existingWallet = await prisma.wallet.findFirst({
-        where: {
-          name: {
-            equals: name
-          }
-        }
-      })
-
-      if (existingWallet) {
-        throw {
-          response: {
-            msg: 'A wallet already exists with the same name',
-          },
-        }
-      }
 
       // Save wallet into database
       const savedWallet = await prisma.wallet.create({
