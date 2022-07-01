@@ -38,6 +38,7 @@ const CreateWalletForm = () => {
 
   const [formState, setFormState] = useState('idle' as FormState)
   const [errorMsg, setErrorMsg] = useState('')
+  const [logs, setLogs] = useState([])
 
   const onSubmit = async (values: any) => {
     if (!wallet) {
@@ -47,6 +48,7 @@ const CreateWalletForm = () => {
     }
 
     try {
+      setLogs([])
       const fanoutSdk = new FanoutClient(connection, wallet)
 
       // Calculate fanout public key
@@ -104,6 +106,7 @@ const CreateWalletForm = () => {
         const json = await res.json()
         setFormState('error')
         setErrorMsg(json.msg)
+        setLogs(json.logs)
       }
     } catch (error: any) {
       setFormState('error')
@@ -151,6 +154,7 @@ const CreateWalletForm = () => {
         submittingMsg="Creating Hydra Wallet..."
         successMsg="Successfully created Hydra Wallet!"
         errorMsg={errorMsg}
+        logs={logs}
       />
       <div className="w-full md:w-1/2 flex flex-col items-center md:items-start gap-10">
         <div className="form-control w-4/5">
