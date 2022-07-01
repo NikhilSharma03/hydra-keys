@@ -78,7 +78,7 @@ const CreateWalletForm = () => {
       const txSigned = await wallet.signTransaction(tx)
 
       // Send API request
-      const res = await fetch('api/createHydraWallet', {
+      const res = await fetch('/api/createHydraWallet', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
