@@ -3,16 +3,17 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { Membership, PrismaClient } from '@prisma/client';
 import { Connection, clusterApiUrl, Cluster, PublicKey } from '@solana/web3.js'
 
-import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
-import { MembershipModel, FanoutClient, Fanout } from '@glasseaters/hydra-sdk';
+import { Fanout } from '@glasseaters/hydra-sdk';
 
 const prisma = new PrismaClient();
 
-function validateWallet(cluster, viewWalletPubkey) {
+async function validateWallet(cluster, viewWalletPubkey) {
     const connection = new Connection(clusterApiUrl(cluster as Cluster), 'confirmed')
     try {
         let publickey = new PublicKey(viewWalletPubkey);
-        let a = Fanout.fromAccountAddress(connection, publickey);
+        await Fanout.fromAccountAddress(connection, publickey).then(data => {
+            console.log(data);
+        });
         return true;
     }
     catch (error: any) {
@@ -54,7 +55,7 @@ export default async function handler(
                 return;
             }
             else {
-                if (validateWallet(cluster, viewWalletPubkey)) {
+                if (await validateWallet(cluster, viewWalletPubkey)) {
                     res.status(200).json({
                         found: true,
                         wallet: element, members: result
