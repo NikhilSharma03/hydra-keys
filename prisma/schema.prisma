@@ -21,6 +21,7 @@ model Wallet {
   totalShares    Int
   cluster        String
   validated      Boolean      @default(false)
+
   @@id([cluster, pubkey])
 }
 
@@ -31,6 +32,7 @@ model Membership {
   cluster      String
   wallet       Wallet   @relation(references: [cluster, pubkey], fields: [cluster, walletPubkey])
   walletPubkey String
+  validated    Boolean  @default(false)
 
   @@id([cluster, walletPubkey, memberPubkey])
 }
