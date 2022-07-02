@@ -6,12 +6,12 @@ import { FanoutClient, Fanout } from '@glasseaters/hydra-sdk';
 
 const prisma = new PrismaClient();
 
-function validateMember(cluster, viewWalletPubkey) {
+async function validateMember(cluster, viewWalletPubkey) {
   const connection = new Connection(clusterApiUrl(cluster as Cluster), 'confirmed')
   try {
     let publickey = new PublicKey(viewWalletPubkey);
     console.log('testing validation');
-    let a = FanoutClient.membershipVoucher(FanoutClient.ID, publickey).then(data => { console.log(data) });
+    await FanoutClient.membershipVoucher(FanoutClient.ID, publickey).then(data => { console.log(data) });
     return true;
   }
   catch (error: any) {
@@ -54,7 +54,7 @@ export default async function handler(
     })
 
     if (!memberwallet.validated) {
-      if (validateMember(cluster, viewUserPubkey)) {
+      if (await validateMember(cluster, viewUserPubkey)) {
         //setting members wallet validated parameter to true
         const setValidated = await prisma.membership.update({
           where: {
