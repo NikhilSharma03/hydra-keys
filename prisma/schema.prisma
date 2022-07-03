@@ -14,7 +14,7 @@ model Wallet {
   name           String
   pubkey         String
   authority      String
-  memberShipType String
+  memberShipType memberShipTypes
   acceptSPL      Boolean
   splToken       String
   membership     Membership[]
@@ -32,5 +32,12 @@ model Membership {
   wallet       Wallet   @relation(references: [cluster, pubkey], fields: [cluster, walletPubkey])
   walletPubkey String
 
+
   @@id([cluster, walletPubkey, memberPubkey])
+}
+
+enum memberShipTypes{
+  Wallet
+  NFT
+  SPL
 }
