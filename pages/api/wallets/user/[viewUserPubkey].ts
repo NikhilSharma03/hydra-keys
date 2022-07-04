@@ -1,8 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Membership, PrismaClient, Wallet } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { Connection, clusterApiUrl, Cluster, PublicKey } from '@solana/web3.js'
-import { FanoutClient, Fanout } from '@glasseaters/hydra-sdk';
+import { FanoutClient, FanoutMembershipVoucher } from '@glasseaters/hydra-sdk';
 
 const prisma = new PrismaClient();
 
@@ -10,12 +10,18 @@ async function validateMember(cluster, viewWalletPubkey) {
   const connection = new Connection(clusterApiUrl(cluster as Cluster), 'confirmed')
   try {
     let publickey = new PublicKey(viewWalletPubkey);
-    console.log('testing validation');
-    await FanoutClient.membershipVoucher(FanoutClient.ID, publickey).then(data => { console.log(data) });
+    const [membershipkey] = await FanoutClient.membershipVoucher(FanoutClient.ID, publickey).then(data => {
+      console.log(data)
+      return data
+    });
+    FanoutMembershipVoucher.fromAccountAddress(connection, membershipkey).then(data => {
+      console.log(data);
+    });
+    
     return true;
   }
   catch (error: any) {
-    console.log('Member wallet not on blockchain');
+    console.log('Member wallet not on blockchain', error);
     return false;
   }
 }
