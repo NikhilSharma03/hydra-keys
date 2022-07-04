@@ -98,6 +98,11 @@ const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
           <p>{wallet.memberShipType}</p>
         </div>
 
+        <div className="flex justify-between">
+          <p>Membership model: </p>
+          <p>{wallet.balance}</p>
+        </div>
+
         <div className="flex w-full justify-between flex-wrap gap-y-5">
           <div className="flex justify-between w-full md:w-1/3">
             <p>Accept SPL token: </p>
