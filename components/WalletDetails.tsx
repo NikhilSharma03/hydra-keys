@@ -99,7 +99,7 @@ const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
         </div>
 
         <div className="flex justify-between">
-          <p>Membership model: </p>
+          <p>Current Balance: </p>
           <p>{wallet.balance}</p>
         </div>
 
