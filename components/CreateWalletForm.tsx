@@ -90,7 +90,7 @@ const CreateWalletForm = () => {
           authority: wallet.publicKey.toBase58(),
           memberShipType: values.model,
           acceptSPL: values.acceptSPL,
-          splToken: values.pubKeySPL,
+          splToken: values.acceptSPL ? values.pubKeySPL : undefined,
           // TODO: Include mint public key for token membership model
           totalShares: values.shares,
           cluster,
