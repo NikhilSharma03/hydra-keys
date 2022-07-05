@@ -17,7 +17,7 @@ export default async function handler(
     const wallets=await prisma.wallet.findMany();
     const membersdb=await prisma.membership.findMany();
     console.log(viewUserPubkey);
-    console.log(viewUserPubkey.length);
+    console.log(viewUserPubkey!.length);
     console.log(cluster);
     //console.log(await prisma.$queryRaw`SELECT * FROM wallet WHERE pubkey=( SELECT walletPubkey FROM membership WHERE membership.memberPubkey=${viewUserPubkey})`)
     //console.log(await prisma.$queryRaw`SELECT * FROM wallet WHERE authority=${viewUserPubkey} AND cluster=${cluster}`);
