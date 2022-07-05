@@ -71,7 +71,7 @@ const EditSPLToken = ({ onCancel, onSuccess, hydraPubKey }: Props) => {
       } else {
         setLoading(false)
         const error = await res.json()
-        formik.setFieldError('pubKeySPL', error)
+        formik.setFieldError('pubKeySPL', error.msg)
       }
     } catch (error: any){
       setLoading(false)

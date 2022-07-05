@@ -32,14 +32,14 @@ export default async function handler(
       },
     })
 
-    if (!wallet) return res.status(404).json('This wallet does not exist')
+    if (!wallet) return res.status(404).json({ msg: 'This wallet does not exist'})
 
     // check if spl token is already specified
-    if (wallet.acceptSPL) res.status(400).json('SPL token already exists')
+    if (wallet.acceptSPL) return res.status(400).json({ msg: 'SPL token already exists'})
 
     // Get the spl token and the transaction
     const { splToken, tx } = req.body
-    if (!splToken || !tx) res.status(400).json('Missing parameters')
+    if (!splToken || !tx) return res.status(400).json({ msg: 'Missing parameters'})
 
     // update wallet's spl token
     try {
@@ -74,7 +74,7 @@ export default async function handler(
         }
       }
 
-      return res.status(200).json(updateWallet)
+      return res.status(200).json({ msg: updateWallet})
     } catch (e: any) {
       if (e instanceof SendTransactionError) {
         await prisma.wallet.update({
@@ -93,9 +93,10 @@ export default async function handler(
         return res.status(500).json({ msg: e.message, logs: e.logs })
       }
 
-      return res.status(400).json(e.meta.cause)
+      return res.status(400).json({ msg: e.meta.cause})
     }
   } else {
-    return res.status(404).json(`Method ${req.method} not valid`)
+    return res.status(404).json({ msg: `Method ${req.method} not valid`
+  })
   }
 }
