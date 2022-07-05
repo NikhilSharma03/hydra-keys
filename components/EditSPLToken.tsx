@@ -102,7 +102,6 @@ const EditSPLToken = ({ onCancel, onSuccess, hydraPubKey }: Props) => {
                 Enter SPL token public key
               </span>
             </label>
-
             <div className="w-full md:w-2/3 flex flex-col">
               <input
                 type="text"

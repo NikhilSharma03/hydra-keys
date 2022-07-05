@@ -10,6 +10,7 @@ import {
 import AddMemberModal from './AddMemberModal'
 import MembersTable from './MembersTable'
 import EditSPLToken from "./EditSPLToken";
+
 import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
 import {useState} from "react";
