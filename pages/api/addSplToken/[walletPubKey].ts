@@ -19,7 +19,7 @@ export default async function handler(
 
     if (!cluster) cluster = 'devnet'
 
-    walletPubKey = walletPubKey.toString()
+    walletPubKey = walletPubKey!.toString()
     cluster = cluster.toString()
 
     // check if the wallet exists in db
