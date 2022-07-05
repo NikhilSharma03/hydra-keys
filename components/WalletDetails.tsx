@@ -1,6 +1,5 @@
 import {
   FaArrowLeft,
-  FaBackward,
   FaBalanceScaleLeft,
   FaCog,
   FaRegEdit,
@@ -32,7 +31,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     toggleUpdateSPL()
     const newWallet = {...wallet}
     newWallet.acceptSPL = true
-    newWallet.pubKeySPL = pubKeySPL
+    newWallet.splToken = pubKeySPL
     setWallet(newWallet)
   }
 
@@ -144,7 +143,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         </div>
 
         <div className={`w-full ${showUpdateSPL ? 'block' : 'hidden'}`}>
-          <EditSPLToken onCancel={toggleUpdateSPL} onSuccess={updateWallet} hydraPubKey={wallet.pubKey}/>
+          <EditSPLToken onCancel={toggleUpdateSPL} onSuccess={updateWallet} hydraPubKey={wallet.pubkey}/>
         </div>
       </div>
 

@@ -9,6 +9,8 @@ import { FanoutClient, Wallet } from '@glasseaters/hydra-sdk'
 import { useAnchorWallet } from '@solana/wallet-adapter-react'
 import { useRef, useState } from 'react'
 import { isValidPubKey } from '../utils/utils'
+import {useAppSelector} from "../hooks/useAppSelector";
+import {selectCluster} from "../redux/features/wallet/walletSlice";
 
 interface FormValues {
   acceptSPL: boolean
@@ -23,10 +25,10 @@ interface Props {
 
 const EditSPLToken = ({ onCancel, onSuccess, hydraPubKey }: Props) => {
   let checkboxRef = useRef<HTMLInputElement>(null)
-
+  const cluster = useAppSelector(selectCluster)
   const [loading, setLoading] = useState(false)
 
-  const connection = new Connection(clusterApiUrl('devnet'), 'confirmed')
+  const connection = new Connection(clusterApiUrl(cluster), 'confirmed')
 
   const wallet = useAnchorWallet() as Wallet
   const fanoutSdk = new FanoutClient(connection, wallet)
@@ -41,17 +43,41 @@ const EditSPLToken = ({ onCancel, onSuccess, hydraPubKey }: Props) => {
   const onSubmit = async (values: any) => {
     setLoading(true)
 
-    const ixSPL = await fanoutSdk.initializeFanoutForMintInstructions({
-      fanout: new PublicKey(hydraPubKey),
-      mint: new PublicKey(values.pubKeySPL),
-    })
-    tx.add(...ixSPL.instructions)
+    try {
+      const ixSPL = await fanoutSdk.initializeFanoutForMintInstructions({
+        fanout: new PublicKey(hydraPubKey),
+        mint: new PublicKey(values.pubKeySPL),
+      })
+      tx.add(...ixSPL.instructions)
 
-    tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
-    tx.feePayer = wallet.publicKey
-    const txSigned = await wallet.signTransaction(tx)
+      tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+      tx.feePayer = wallet.publicKey
+      const txSigned = await wallet.signTransaction(tx)
 
-    // Call the API to add spl token
+      // Call the API to add spl token
+      const res = await fetch(`/api/addSplToken/${hydraPubKey}?cluster=${cluster}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tx: txSigned.serialize().toString('base64'),
+          splToken: values.pubKeySPL,
+        }),
+      })
+
+      if(res.status == 200) {
+        onSuccess(values.pubKeySPL)
+      } else {
+        setLoading(false)
+        const error = await res.json()
+        formik.setFieldError('pubKeySPL', error)
+      }
+    } catch (error: any){
+      setLoading(false)
+      formik.setFieldError('pubKeySPL', error.message)
+    }
+
   }
 
   const validate = (values: any) => {
@@ -127,7 +153,7 @@ const EditSPLToken = ({ onCancel, onSuccess, hydraPubKey }: Props) => {
           <button
             type="submit"
             className="btn btn-primary disabled:opacity-30 disabled:bg-primary disabled:text-white"
-            disabled={!(formik.dirty && formik.isValid) || loading}
+            disabled={loading}
           >
             Update
           </button>
