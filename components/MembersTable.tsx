@@ -2,9 +2,10 @@ import styles from '../styles/MemembersList.module.css'
 
 type MemembersDetailsProps = {
   members: Array<any>
+  onHandleDistribute: Function
 }
 
-const MembersTable = ({ members }: MemembersDetailsProps) => {
+const MembersTable = ({ members, onHandleDistribute }: MemembersDetailsProps ) => {
   return (
     <table className="table-normal rounded w-full">
       <thead className={`text-xl ${styles.th}`}>
@@ -26,6 +27,7 @@ const MembersTable = ({ members }: MemembersDetailsProps) => {
             <td className="text-center">
               <button
                 className={`btn w-8/12 sm:w-fit px-6 text-lg font-normal border-none ${styles.distributeBtn}`}
+                onClick={() => onHandleDistribute(member?.walletPubkey)}
               >
                 Distribute
               </button>

@@ -10,6 +10,9 @@ import AddMemberModal from './AddMemberModal'
 import MembersTable from './MembersTable'
 import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
+import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
+import { FanoutClient } from '@glasseaters/hydra-sdk'
+import { PublicKey } from '@solana/web3.js'
 
 type WalletDetailsProps = {
   wallet: any
@@ -17,6 +20,54 @@ type WalletDetailsProps = {
 }
 
 const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
+
+  const { connection } = useConnection()
+  const anchorwallet = useAnchorWallet()
+
+  const handleDistribute = async (memberPubkey) => {
+    if (!anchorwallet) {
+      return
+    }
+
+    try {
+
+      // Calculate fanout public key
+      const [fanoutPubkey] = await FanoutClient.fanoutKey(wallet.name)
+
+      const fanoutSdk = new FanoutClient(connection, anchorwallet)
+
+      // Generate the distribution instructions
+      let distMember1 = await fanoutSdk.distributeWalletMemberInstructions({
+        distributeForMint: false,
+        fanout: fanoutPubkey,
+        payer: anchorwallet.publicKey,
+        member: new PublicKey(memberPubkey),
+      })
+
+      console.log(distMember1?.instructions);
+      
+      // Send the distribution instructions
+      const tx = await fanoutSdk.sendInstructions(
+        [...distMember1?.instructions],
+        wallet,
+        anchorwallet?.publicKey
+      )
+
+      console.log(tx);
+      
+      if (!!tx.RpcResponseAndContext.value.err) {
+        const txdetails = await connection.getTransaction(
+          tx.TransactionSignature
+        )
+        console.log(txdetails, tx.RpcResponseAndContext.value.err)
+      }
+
+    } catch (error: any) {
+      console.error(error);
+    }
+
+  }
+
   return (
     <div className="w-full flex flex-col gap-8">
       <div className="flex justify-between flex-wrap gap-5 md:gap-0 pb-2">
@@ -75,7 +126,7 @@ const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
           className={`card-bordered shadow-xl w-full rounded h-80 overflow-y-scroll ${styles.membersTableBg} ${styles.borderColor}`}
         >
           {members.length > 0 ? (
-            <MembersTable members={members} />
+            <MembersTable members={members} onHandleDistribute={handleDistribute}/>
           ) : (
             <p className="text-center text-xl font-bold">
               No members please add new members
