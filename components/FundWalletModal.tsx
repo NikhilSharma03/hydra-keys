@@ -17,6 +17,7 @@ interface FormValues {
 const FundWalletModal = ({ modalId, hydraWallet }: FundWalletModalProps) => {
   const [formState, setFormState] = useState('idle' as FormState)
   const [errorMsg, setErrorMsg] = useState('')
+  const [errorLogs, setErrorLogs] = useState([])
   const [nativeAccount, setNativeAccount] = useState('')
   const { connection } = useConnection()
   const wallet = useAnchorWallet()
@@ -78,6 +79,7 @@ const FundWalletModal = ({ modalId, hydraWallet }: FundWalletModalProps) => {
         resetForm()
       }
     } catch (error: any) {
+      setErrorLogs(error.logs)
       setFormState('error')
       setErrorMsg(`Failed to fund wallet: ${error.message}`)
     }
@@ -152,6 +154,7 @@ const FundWalletModal = ({ modalId, hydraWallet }: FundWalletModalProps) => {
               submittingMsg={'Sending funds to Hydra Wallet...'}
               successMsg={'Successfully transferred funds to Hydra Wallet!'}
               errorMsg={errorMsg}
+              logs={errorLogs}
             />
             <div className="modal-action">
               <button
