@@ -28,6 +28,7 @@ export default async function handler(
       acceptSPL,
       splToken,
       totalShares,
+      balance,
       cluster,
     } = req.body
 
@@ -48,6 +49,7 @@ export default async function handler(
           splToken: splToken,
           // TODO: Include mint public key for Token membership model
           totalShares: totalShares,
+          balance: balance,
           cluster: cluster,
         },
       })
