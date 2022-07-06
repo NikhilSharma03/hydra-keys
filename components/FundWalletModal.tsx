@@ -131,6 +131,7 @@ const FundWalletModal = ({ modalId, hydraWallet }: FundWalletModalProps) => {
                 type="text"
                 className="input input-bordered w-full"
                 value={nativeAccount}
+                readOnly
               />
             </div>
             <div className="form-control w-full">
