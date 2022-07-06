@@ -27,7 +27,7 @@ const MembersTable = ({ members, onHandleDistribute }: MemembersDetailsProps ) =
             <td className="text-center">
               <button
                 className={`btn w-8/12 sm:w-fit px-6 text-lg font-normal border-none ${styles.distributeBtn}`}
-                onClick={() => onHandleDistribute(member?.walletPubkey)}
+                onClick={() => onHandleDistribute(member?.memberPubkey)}
               >
                 Distribute
               </button>
