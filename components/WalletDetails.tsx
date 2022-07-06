@@ -10,6 +10,7 @@ import AddMemberModal from './AddMemberModal'
 import MembersTable from './MembersTable'
 import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
+import FundWalletModal from './FundWalletModal'
 
 type WalletDetailsProps = {
   wallet: any
@@ -27,7 +28,10 @@ const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
           <span className="break-words">{wallet.pubkey}</span>
         </div>
 
-        <div className=" w-full md:w-1/3 flex justify-center md:justify-end">
+        <div className=" w-full md:w-1/3 flex justify-center md:justify-end gap-2">
+          <label htmlFor="fund-wallet-modal" className="btn btn-secondary">
+            Fund Wallet
+          </label>
           <div className="tooltip tooltip-secondary" data-tip="Add members">
             <label
               htmlFor="add-member-modal"
@@ -115,7 +119,8 @@ const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
         </div>
       </div>
 
-      <AddMemberModal hydraWallet = {wallet} />
+      <AddMemberModal hydraWallet={wallet} />
+      <FundWalletModal modalId="fund-wallet-modal" hydraWallet={wallet} />
     </div>
   )
 }
