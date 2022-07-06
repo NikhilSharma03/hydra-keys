@@ -133,7 +133,7 @@ const CreateWalletForm = () => {
   }
 
   const checkNumeric = (event: any) => {
-    if (event.key == '.') {
+    if (event.key == '.' || event.key == '-') {
       event.preventDefault()
     }
   }
