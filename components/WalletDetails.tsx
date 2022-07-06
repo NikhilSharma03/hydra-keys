@@ -66,11 +66,18 @@ const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
         ...(await connection.getLatestBlockhash()),
       })
 
-      setFormState('success')
+      if (result.value.err) {
+        setFormState('error')
+        setErrorMsg(
+          `Failed to confirm transaction: ${result.value.err.toString()}`
+        )
+      } else {
+        setFormState('success')
+      }
     } catch (error: any) {
+      setLogs(error.logs)
       setFormState('error')
-      setErrorMsg(JSON.stringify(error))
-      console.error(error)
+      setErrorMsg(`Failed to distribute wallet funds: ${error.message}`)
     }
   }
 
@@ -139,7 +146,7 @@ const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
         />
         {/*add members table here */}
         <div
-          className={`card-bordered shadow-xl w-full rounded h-80 overflow-y-scroll ${styles.membersTableBg} ${styles.borderColor}`}
+          className={`mt-6 card-bordered shadow-xl w-full rounded h-80 overflow-y-scroll ${styles.membersTableBg} ${styles.borderColor}`}
         >
           {members.length > 0 ? (
             <MembersTable
