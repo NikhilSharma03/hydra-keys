@@ -10,10 +10,12 @@ import AddMemberModal from './AddMemberModal'
 import MembersTable from './MembersTable'
 import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
-import FundWalletModal from './FundWalletModal'
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
 import { FanoutClient } from '@glasseaters/hydra-sdk'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, Transaction } from '@solana/web3.js'
+import FormStateAlert, { FormState } from './FormStateAlert'
+import { useState } from 'react'
+import FundWalletModal from './FundWalletModal'
 
 type WalletDetailsProps = {
   wallet: any
@@ -21,52 +23,55 @@ type WalletDetailsProps = {
 }
 
 const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
-
+  const [formState, setFormState] = useState('idle' as FormState)
+  const [errorMsg, setErrorMsg] = useState('')
+  const [logs, setLogs] = useState([])
   const { connection } = useConnection()
   const anchorwallet = useAnchorWallet()
 
   const handleDistribute = async (memberPubkey) => {
+    setFormState('submitting')
     if (!anchorwallet) {
       return
     }
 
     try {
-
-      // Calculate fanout public key
-      const [fanoutPubkey] = await FanoutClient.fanoutKey(wallet.name)
-
+      setLogs([])
       const fanoutSdk = new FanoutClient(connection, anchorwallet)
 
       // Generate the distribution instructions
-      let distMember1 = await fanoutSdk.distributeWalletMemberInstructions({
+      let distMember = await fanoutSdk.distributeWalletMemberInstructions({
         distributeForMint: false,
-        fanout: fanoutPubkey,
+        fanout: new PublicKey(wallet.pubkey),
         payer: anchorwallet.publicKey,
         member: new PublicKey(memberPubkey),
       })
 
-      console.log(distMember1?.instructions);
-      
-      // Send the distribution instructions
-      const tx = await fanoutSdk.sendInstructions(
-        [...distMember1?.instructions],
-        wallet,
-        anchorwallet?.publicKey
+      console.log(distMember?.instructions)
+
+      const tx = new Transaction()
+      tx.add(...distMember.instructions)
+
+      // Sign transaction using user's wallet
+      tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+      tx.feePayer = anchorwallet.publicKey
+      const txSigned = await anchorwallet.signTransaction(tx)
+
+      // Send transaction
+      const signature = await connection.sendRawTransaction(
+        txSigned.serialize()
       )
+      const result = await connection.confirmTransaction({
+        signature,
+        ...(await connection.getLatestBlockhash()),
+      })
 
-      console.log(tx);
-      
-      if (!!tx.RpcResponseAndContext.value.err) {
-        const txdetails = await connection.getTransaction(
-          tx.TransactionSignature
-        )
-        console.log(txdetails, tx.RpcResponseAndContext.value.err)
-      }
-
+      setFormState('success')
     } catch (error: any) {
-      console.error(error);
+      setFormState('error')
+      setErrorMsg(JSON.stringify(error))
+      console.error(error)
     }
-
   }
 
   return (
@@ -125,12 +130,22 @@ const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
 
           <p>Total shares: {wallet.totalShares}</p>
         </div>
+        <FormStateAlert
+          state={formState}
+          submittingMsg="Distributing funds"
+          successMsg="Successfully Distributed!"
+          errorMsg={errorMsg}
+          logs={logs}
+        />
         {/*add members table here */}
         <div
           className={`card-bordered shadow-xl w-full rounded h-80 overflow-y-scroll ${styles.membersTableBg} ${styles.borderColor}`}
         >
           {members.length > 0 ? (
-            <MembersTable members={members} onHandleDistribute={handleDistribute}/>
+            <MembersTable
+              members={members}
+              onHandleDistribute={handleDistribute}
+            />
           ) : (
             <p className="text-center text-xl font-bold">
               No members please add new members
