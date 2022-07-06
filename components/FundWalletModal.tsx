@@ -3,6 +3,7 @@ import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
 import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 import { FormikErrors, useFormik } from 'formik'
 import { useEffect, useState } from 'react'
+import CopyToClipboard from './CopyToClipboard'
 import FormStateAlert, { FormState } from './FormStateAlert'
 
 type FundWalletModalProps = {
@@ -127,12 +128,15 @@ const FundWalletModal = ({ modalId, hydraWallet }: FundWalletModalProps) => {
               <label className="label">
                 <span className="label-text">Hydra Wallet Native Account</span>
               </label>
-              <input
-                type="text"
-                className="input input-bordered w-full"
-                value={nativeAccount}
-                readOnly
-              />
+              <div className="flex flex-row items-center gap-2">
+                <input
+                  type="text"
+                  className="input input-bordered w-full flex-1"
+                  value={nativeAccount}
+                  readOnly
+                />
+                <CopyToClipboard text={nativeAccount} />
+              </div>
             </div>
             <div className="form-control w-full">
               <label className="label">
