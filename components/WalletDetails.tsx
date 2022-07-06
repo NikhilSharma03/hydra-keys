@@ -12,6 +12,7 @@ import EditSPLToken from "./EditSPLToken";
 import FundWalletModal from './FundWalletModal'
 import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
+import FundWalletModal from './FundWalletModal'
 
 import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
 import { useEffect, useState } from 'react'
