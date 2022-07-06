@@ -16,6 +16,8 @@ import FundWalletModal from './FundWalletModal'
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
 import { FanoutClient } from '@glasseaters/hydra-sdk'
 import { PublicKey } from '@solana/web3.js'
+import FormStateAlert, { FormState } from './FormStateAlert'
+import { useState } from 'react'
 
 import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
 import { useEffect, useState } from 'react'
