@@ -1,6 +1,6 @@
 import { Fanout } from '@glasseaters/hydra-sdk'
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
-import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
+import { LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 import { FormikErrors, useFormik } from 'formik'
 import { useEffect, useState } from 'react'
 import CopyToClipboard from './CopyToClipboard'
@@ -52,7 +52,7 @@ const FundWalletModal = ({ modalId, hydraWallet }: FundWalletModalProps) => {
       const ixTransfer = SystemProgram.transfer({
         fromPubkey: wallet.publicKey,
         toPubkey: new PublicKey(nativeAccount),
-        lamports: values.amount,
+        lamports: values.amount * LAMPORTS_PER_SOL,
       })
       tx.add(ixTransfer)
 
@@ -96,12 +96,6 @@ const FundWalletModal = ({ modalId, hydraWallet }: FundWalletModalProps) => {
     return errors
   }
 
-  const checkNumeric = (event: any) => {
-    if (event.key == '.') {
-      event.preventDefault()
-    }
-  }
-
   const formik = useFormik({
     initialValues,
     onSubmit,
@@ -140,12 +134,11 @@ const FundWalletModal = ({ modalId, hydraWallet }: FundWalletModalProps) => {
             </div>
             <div className="form-control w-full">
               <label className="label">
-                <span className="label-text">Amount (Lamports)</span>
+                <span className="label-text">Amount (SOL)</span>
               </label>
               <input
                 type="number"
                 className="input input-bordered w-full"
-                onKeyPress={checkNumeric}
                 {...formik.getFieldProps('amount')}
               />
               <label className="label">
