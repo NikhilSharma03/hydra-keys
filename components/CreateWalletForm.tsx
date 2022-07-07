@@ -29,7 +29,6 @@ const CreateWalletForm = () => {
     model: 'Wallet membership',
     acceptSPL: false,
     pubKeySPL: '',
-    balance: 0.0,
   }
 
   const router = useRouter()
@@ -94,7 +93,6 @@ const CreateWalletForm = () => {
           splToken: values.pubKeySPL,
           // TODO: Include mint public key for token membership model
           totalShares: values.shares,
-          balance: values.balance,
           cluster,
         }),
       })
