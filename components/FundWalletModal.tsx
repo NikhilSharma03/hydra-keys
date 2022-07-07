@@ -1,6 +1,11 @@
-import { Fanout } from '@glasseaters/hydra-sdk'
+import { FanoutClient } from '@glasseaters/hydra-sdk'
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
-import { LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
+import {
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+} from '@solana/web3.js'
 import { FormikErrors, useFormik } from 'formik'
 import { useEffect, useState } from 'react'
 import CopyToClipboard from './CopyToClipboard'
@@ -27,17 +32,18 @@ const FundWalletModal = ({ modalId, hydraWallet }: FundWalletModalProps) => {
     amount: 0,
   }
 
-  // Fetching the native account public key from the blockchain for now until
-  // it is available in the API and database
   useEffect(() => {
     (async () => {
-      const fanout = await Fanout.fromAccountAddress(
-        connection,
-        new PublicKey(hydraWallet.pubkey)
-      )
-      setNativeAccount(fanout.accountKey.toBase58())
+      try {
+        const [derivedNativeAccount] = await FanoutClient.nativeAccount(
+          new PublicKey(hydraWallet.pubkey)
+        )
+        setNativeAccount(derivedNativeAccount.toBase58())
+      } catch (error) {
+        console.error(error)
+      }
     })()
-  }, [connection, hydraWallet.pubkey])
+  }, [hydraWallet.pubkey])
 
   const onSubmit = async (values: FormValues, { resetForm }) => {
     if (!wallet) {
