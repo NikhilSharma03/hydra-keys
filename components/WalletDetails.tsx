@@ -48,7 +48,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
 
   const updateWallet = (pubKeySPL) => {
     toggleUpdateSPL()
-    const newWallet = {...wallet}
+    const newWallet = { ...wallet }
     newWallet.acceptSPL = true
     newWallet.splToken = pubKeySPL
     setWallet(newWallet)
@@ -199,7 +199,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
               onHandleDistribute={handleDistribute}
             />
           ) : (
-            <p className="text-center text-xl font-bold">
+            <p className="text-center text-xl font-bold mt-5">
               No members please add new members
             </p>
           )}
@@ -229,7 +229,9 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
           <div className="flex justify-between w-full md:w-1/3">
             <p>Accept SPL token: </p>
             <div className="text-primary">
-              {wallet.acceptSPL ? <span>Accept</span> : (
+              {wallet.acceptSPL ? (
+                <span>Accept</span>
+              ) : (
                 <div className="flex gap-10">
                   No
                   <FaRegEdit
@@ -252,7 +254,11 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         </div>
 
         <div className={`w-full ${showUpdateSPL ? 'block' : 'hidden'}`}>
-          <EditSPLToken onCancel={toggleUpdateSPL} onSuccess={updateWallet} hydraPubKey={wallet.pubkey}/>
+          <EditSPLToken
+            onCancel={toggleUpdateSPL}
+            onSuccess={updateWallet}
+            hydraPubKey={wallet.pubkey}
+          />
         </div>
       </div>
 
