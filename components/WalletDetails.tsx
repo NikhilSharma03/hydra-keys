@@ -10,6 +10,10 @@ import AddMemberModal from './AddMemberModal'
 import MembersTable from './MembersTable'
 import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
+import { Fanout } from '@glasseaters/hydra-sdk'
+import { useEffect, useState } from 'react'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 
 type WalletDetailsProps = {
   wallet: any
@@ -17,6 +21,32 @@ type WalletDetailsProps = {
 }
 
 const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
+   
+  const [balance, setBalance] = useState()
+  const [totalinflow, setTotalinflow] = useState()
+  const [totalshares, setTotalshares] = useState()
+  const { connection } = useConnection()
+  
+  //Derive Balance, totalavailableshares, totalinflow from blockchain
+  useEffect(() => {
+    (async () => {
+      const fanout = await Fanout.fromAccountAddress(
+        connection,
+        new PublicKey(wallet.pubkey)
+      )
+      const nativeAccountPubkey = fanout.accountKey
+      const nativeAccountInfo = await connection.getAccountInfo(
+          nativeAccountPubkey
+      )
+      const total_available_share= fanout.totalAvailableShares
+      const total_inflow_share= fanout.totalAvailableShares
+      
+      setBalance(nativeAccountInfo?.lamports / LAMPORTS_PER_SOL)
+      // setTotalshares(total_available_share)
+      // setTotalinflow(total_inflow_share)
+    })()
+  }, [connection, wallet.pubkey])
+
   return (
     <div className="w-full flex flex-col gap-8">
       <div className="flex justify-between flex-wrap gap-5 md:gap-0 pb-2">
@@ -100,7 +130,17 @@ const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
 
         <div className="flex justify-between">
           <p>Current Balance: </p>
-          <p>{wallet.balance}</p>
+          <p>{balance}</p>
+        </div>
+
+        <div className="flex justify-between">
+          <p>Total inflow of Shares: </p>
+          <p>{totalinflow}</p>
+        </div>
+
+        <div className="flex justify-between">
+          <p>Total Available Shares: </p>
+          <p>{totalshares}</p>
         </div>
 
         <div className="flex w-full justify-between flex-wrap gap-y-5">
