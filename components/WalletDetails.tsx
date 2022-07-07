@@ -234,9 +234,10 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
 
             <p className="text-xl font-bold ">Members</p>
           </div>
-
-          <p>Total shares: {wallet.totalShares}</p>
-          <p>Available shares: {availableShares}</p>
+          <div className = "justify-between w-0.25">
+            <p>Total shares: {wallet.totalShares} &nbsp; &nbsp;Available shares: {availableShares}</p>
+          </div>
+          
         </div>
 
         <FormStateAlert
@@ -246,7 +247,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
           errorMsg={errorMsg}
           logs={logs}
         />
-          <FormStateAlert
+        <FormStateAlert
           state={formState2}
           submittingMsg="Refreshing"
           successMsg="Success!"
@@ -300,9 +301,8 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
                   No
                   <FaRegEdit
                     onClick={toggleUpdateSPL}
-                    className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${
-                      showUpdateSPL ? 'hidden' : 'inline'
-                    }`}
+                    className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${showUpdateSPL ? 'hidden' : 'inline'
+                      }`}
                   />
                 </div>
               )}
