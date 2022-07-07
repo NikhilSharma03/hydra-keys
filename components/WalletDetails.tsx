@@ -35,8 +35,6 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const { connection } = useConnection()
   const anchorwallet = useAnchorWallet()
   const [balance, setBalance] = useState()
-  const [totalinflow, setTotalinflow] = useState()
-  const [totalshares, setTotalshares] = useState()
 
   const toggleUpdateSPL = () => {
     setShowUpdateSPL(!showUpdateSPL)
@@ -61,12 +59,8 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
        const nativeAccountInfo = await connection.getAccountInfo(
            nativeAccountPubkey
        )
-       const total_available_share= fanout.totalAvailableShares
-       const total_inflow_share= fanout.totalAvailableShares
       
        setBalance(nativeAccountInfo?.lamports / LAMPORTS_PER_SOL)
-       // setTotalshares(total_available_share)
-       // setTotalinflow(total_inflow_share)
      })()
    }, [connection, wallet.pubkey])
   
@@ -220,16 +214,6 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         <div className="flex justify-between">
           <p>Current Balance: </p>
           <p>{balance}</p>
-        </div>
-
-        <div className="flex justify-between">
-          <p>Total inflow of Shares: </p>
-          <p>{totalinflow}</p>
-        </div>
-
-        <div className="flex justify-between">
-          <p>Total Available Shares: </p>
-          <p>{totalshares}</p>
         </div>
 
         <div className="flex w-full justify-between flex-wrap gap-y-5">
