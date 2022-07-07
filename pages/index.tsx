@@ -1,5 +1,10 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
+
+import HomeBannerSvg from '../assets/svg/homeBanner'
+import ArrowSvg from '../assets/svg/arrow'
+import styles from './../styles/Home.module.css'
+import MidSection from '../components/MidSection'
 import HomeCarousel from '../components/HomeCarousel'
 import HeroSection from '../components/HeroSection'
 import Footer from '../components/Footer'
@@ -30,8 +35,13 @@ const Home: NextPage = () => {
       </Head>
 
       <HeroSection onHandleGetStarted={handleGetStarted} />
+      <MidSection/>
       <HomeCarousel />
-      <Footer />
+     
+
+      <Footer/>
+     
+      
     </div>
   )
 }
