@@ -91,7 +91,7 @@ const CreateWalletForm = () => {
           authority: wallet.publicKey.toBase58(),
           memberShipType: values.model,
           acceptSPL: values.acceptSPL,
-          splToken: values.pubKeySPL,
+          splToken: values.acceptSPL ? values.pubKeySPL : undefined,
           // TODO: Include mint public key for token membership model
           totalShares: values.shares,
           cluster,
@@ -137,7 +137,7 @@ const CreateWalletForm = () => {
   }
 
   const checkNumeric = (event: any) => {
-    if (event.key == '.') {
+    if (event.key == '.' || event.key == '-') {
       event.preventDefault()
     }
   }
@@ -189,6 +189,7 @@ const CreateWalletForm = () => {
           </label>
           <input
             type="number"
+            min="1"
             id="shares"
             placeholder="Enter a number of shares"
             className="input input-bordered w-full"
