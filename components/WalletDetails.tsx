@@ -1,13 +1,15 @@
 import {
   FaArrowLeft,
-  FaBackward,
   FaBalanceScaleLeft,
   FaCog,
+  FaRegEdit,
   FaUserPlus,
   FaUsers,
 } from 'react-icons/fa'
 import AddMemberModal from './AddMemberModal'
 import MembersTable from './MembersTable'
+import EditSPLToken from "./EditSPLToken";
+
 import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
 import FundWalletModal from './FundWalletModal'
@@ -18,16 +20,30 @@ import FormStateAlert, { FormState } from './FormStateAlert'
 import { useState } from 'react'
 
 type WalletDetailsProps = {
-  wallet: any
+  initialWallet: any
   members: any
 }
 
-const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
+const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const [formState, setFormState] = useState('idle' as FormState)
+  const [showUpdateSPL, setShowUpdateSPL] = useState(false)
+  const [wallet, setWallet] = useState(initialWallet)
   const [errorMsg, setErrorMsg] = useState('')
   const [logs, setLogs] = useState([])
   const { connection } = useConnection()
   const anchorwallet = useAnchorWallet()
+
+  const toggleUpdateSPL = () => {
+    setShowUpdateSPL(!showUpdateSPL)
+  }
+
+  const updateWallet = (pubKeySPL) => {
+    toggleUpdateSPL()
+    const newWallet = {...wallet}
+    newWallet.acceptSPL = true
+    newWallet.splToken = pubKeySPL
+    setWallet(newWallet)
+  }
 
   const handleDistribute = async (memberPubkey) => {
     setFormState('submitting')
@@ -178,9 +194,19 @@ const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
         <div className="flex w-full justify-between flex-wrap gap-y-5">
           <div className="flex justify-between w-full md:w-1/3">
             <p>Accept SPL token: </p>
-            <p className="text-primary">
-              {wallet.acceptSPL ? <span>Accept</span> : <span>No</span>}
-            </p>
+            <div className="text-primary">
+              {wallet.acceptSPL ? <span>Accept</span> : (
+                <div className="flex gap-10">
+                  No
+                  <FaRegEdit
+                    onClick={toggleUpdateSPL}
+                    className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${
+                      showUpdateSPL ? 'hidden' : 'inline'
+                    }`}
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
           {wallet.acceptSPL ? (
@@ -189,6 +215,10 @@ const WalletDetails = ({ wallet, members }: WalletDetailsProps) => {
               <p className="text-primary break-words"> {wallet.splToken}</p>
             </div>
           ) : null}
+        </div>
+
+        <div className={`w-full ${showUpdateSPL ? 'block' : 'hidden'}`}>
+          <EditSPLToken onCancel={toggleUpdateSPL} onSuccess={updateWallet} hydraPubKey={wallet.pubkey}/>
         </div>
       </div>
 

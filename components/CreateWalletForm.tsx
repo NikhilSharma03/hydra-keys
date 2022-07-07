@@ -7,6 +7,7 @@ import { useAppSelector } from '../hooks/useAppSelector'
 import { selectCluster } from '../redux/features/wallet/walletSlice'
 import FormStateAlert, { FormState } from './FormStateAlert'
 import { useRouter } from 'next/router'
+import { isValidPubKey } from '../utils/utils'
 
 interface FormValues {
   name: string
@@ -125,9 +126,12 @@ const CreateWalletForm = () => {
       errors.shares = 'Enter a valid number of shares'
     }
 
-    if (values.acceptSPL && !values.pubKeySPL) {
-      errors.pubKeySPL = 'This field is required'
-    }
+    if (values.acceptSPL)
+      values.pubKeySPL
+        ? isValidPubKey(values.pubKeySPL)
+          ? (errors.pubKeySPL = 'Please enter a valid public key')
+          : null
+        : (errors.pubKeySPL = 'This field is required')
 
     return errors
   }
