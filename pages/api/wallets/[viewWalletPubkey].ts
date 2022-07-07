@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Membership, PrismaClient } from '@prisma/client';
+import { clusters, Membership, PrismaClient } from '@prisma/client';
 import { MembershipModel } from '@glasseaters/hydra-sdk';
 
 const prisma=new PrismaClient();
@@ -13,14 +13,23 @@ export default async function handler(
     console.log(req.query);
     let { cluster, viewWalletPubkey } = req.query; 
     if(cluster==undefined){
-        cluster="mainnet-beta";
+        cluster="mainnet_beta";
     }
     console.log(viewWalletPubkey);
     const wallets=await prisma.wallet.findMany();
     const membersdb: Membership[] =await prisma.membership.findMany();
     console.log(wallets);
     console.log(membersdb);
-    const result = await prisma.$queryRaw`SELECT * FROM membership WHERE walletPubkey=${viewWalletPubkey} AND cluster=${cluster}`;
+    const result=await prisma.membership.findMany(
+        {
+          where:{
+            walletPubkey:viewWalletPubkey.toString(),
+            cluster:<keyof typeof clusters> cluster
+          },
+          
+        }
+      );
+    //const result = await prisma.$queryRaw`SELECT * FROM membership WHERE walletPubkey=${viewWalletPubkey} AND cluster=${cluster}`;
     console.log("result");
     console.log(result);
     for (let index = 0; index < wallets.length; index++) {
