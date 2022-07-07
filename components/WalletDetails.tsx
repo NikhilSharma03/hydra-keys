@@ -34,9 +34,13 @@ type WalletDetailsProps = {
 
 const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const [formState, setFormState] = useState('idle' as FormState)
+  const [formState2, setFormState2] = useState('idle' as FormState)
   const [showUpdateSPL, setShowUpdateSPL] = useState(false)
   const [wallet, setWallet] = useState(initialWallet)
-  const [availableShares, setAvailableShares] = useState(initialWallet.totalShares)
+  const [availableShares, setAvailableShares] = useState(
+    initialWallet.totalShares
+  )
+
   const [errorMsg, setErrorMsg] = useState('')
   const [logs, setLogs] = useState([])
   const { connection } = useConnection()
@@ -44,8 +48,8 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const [balance, setBalance] = useState()
 
   useEffect(() => {
-    console.log('Available shares: ', availableShares);
-  }, [availableShares]);
+    handleRefresh()
+  }, [members])
 
   const toggleUpdateSPL = () => {
     setShowUpdateSPL(!showUpdateSPL)
@@ -131,7 +135,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   }
 
   const handleRefresh = async () => {
-    setFormState('submitting')
+    setFormState2('submitting')
     if (!anchorwallet) {
       return
     }
@@ -146,24 +150,27 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       // console.log('refreshed')
       // console.log(wallet.pubkey)
 
-      const fanoutObject = await fanoutSdk.fetch<Fanout>(fanoutPubkey, Fanout);
-   
- 
+      const fanoutObject = await fanoutSdk.fetch<Fanout>(fanoutPubkey, Fanout)
+
       console.log(fanoutObject)
       console.log(fanoutObject.totalMembers.toString())
       console.log(fanoutObject.totalAvailableShares.toString())
       console.log(fanoutObject.totalInflow.toString())
-      
-     setAvailableShares(fanoutObject.totalAvailableShares.toString())
+
+      setAvailableShares(fanoutObject.totalAvailableShares.toString())
+
+      if (+fanoutObject.totalMembers.toString() != 0) {
+        console.log('different')
+      }
 
       setTimeout(function () {
-        setFormState('idle')
+        setFormState2('idle')
       }, 1000)
     } catch (error: any) {
       console.log(error)
       setLogs(error.logs)
-      setFormState('error')
-      setErrorMsg(`Failed to distribute wallet funds: ${error.message}`)
+      setFormState2('error')
+      setErrorMsg(`Failed to refresh: ${error.message}`)
     }
   }
 
@@ -236,6 +243,13 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
           state={formState}
           submittingMsg="Distributing funds"
           successMsg="Successfully Distributed!"
+          errorMsg={errorMsg}
+          logs={logs}
+        />
+          <FormStateAlert
+          state={formState2}
+          submittingMsg="Refreshing"
+          successMsg="Success!"
           errorMsg={errorMsg}
           logs={logs}
         />
