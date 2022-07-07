@@ -19,7 +19,6 @@ model Wallet {
   splToken       String
   membership     Membership[]
   totalShares    Int
-  balance        Float
   cluster        String
   validated      Boolean      @default(false)
   @@id([cluster, pubkey])
