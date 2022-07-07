@@ -14,11 +14,17 @@ export default async function handler(
     if(cluster==undefined){
       cluster="mainnet-beta";
     }
-    const wallets=await prisma.wallet.findMany();
+    const wallets=await prisma.wallet.findMany(
+      {
+        where:{
+          authority:cluster
+        }
+      }
+    );
     const membersdb=await prisma.membership.findMany();
     console.log(viewUserPubkey);
     console.log(viewUserPubkey.length);
-    console.log(cluster);
+    console.log(wallets);
     //console.log(await prisma.$queryRaw`SELECT * FROM wallet WHERE pubkey=( SELECT walletPubkey FROM membership WHERE membership.memberPubkey=${viewUserPubkey})`)
     //console.log(await prisma.$queryRaw`SELECT * FROM wallet WHERE authority=${viewUserPubkey} AND cluster=${cluster}`);
     const result: []  = await prisma.$queryRaw`SELECT * FROM wallet WHERE pubkey=( SELECT walletPubkey FROM membership WHERE membership.memberPubkey=${viewUserPubkey}) 
