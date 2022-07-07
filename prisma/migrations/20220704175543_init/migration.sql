@@ -5,8 +5,10 @@ CREATE TABLE "Wallet" (
     "authority" TEXT NOT NULL,
     "memberShipType" TEXT NOT NULL,
     "acceptSPL" BOOLEAN NOT NULL,
+    "splToken" TEXT NOT NULL,
     "totalShares" INTEGER NOT NULL,
     "cluster" TEXT NOT NULL,
+    "validated" BOOLEAN NOT NULL DEFAULT false,
 
     PRIMARY KEY ("cluster", "pubkey")
 );
@@ -22,4 +24,3 @@ CREATE TABLE "Membership" (
     PRIMARY KEY ("cluster", "walletPubkey", "memberPubkey"),
     CONSTRAINT "Membership_cluster_walletPubkey_fkey" FOREIGN KEY ("cluster", "walletPubkey") REFERENCES "Wallet" ("cluster", "pubkey") ON DELETE RESTRICT ON UPDATE CASCADE
 );
-

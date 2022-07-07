@@ -7,6 +7,7 @@ import { useAppSelector } from '../hooks/useAppSelector'
 import { selectCluster } from '../redux/features/wallet/walletSlice'
 import FormStateAlert, { FormState } from './FormStateAlert'
 import { useRouter } from 'next/router'
+import { isValidPubKey } from '../utils/utils'
 
 interface FormValues {
   name: string
@@ -50,7 +51,7 @@ const CreateWalletForm = () => {
     try {
       setLogs([])
       const fanoutSdk = new FanoutClient(connection, wallet)
-
+      console.log(values)
       // Calculate fanout public key
       const [fanoutPubkey] = await FanoutClient.fanoutKey(values.name)
 
@@ -90,7 +91,7 @@ const CreateWalletForm = () => {
           authority: wallet.publicKey.toBase58(),
           memberShipType: values.model,
           acceptSPL: values.acceptSPL,
-          splToken: values.pubKeySPL,
+          splToken: values.acceptSPL ? values.pubKeySPL : undefined,
           // TODO: Include mint public key for token membership model
           totalShares: values.shares,
           cluster,
@@ -125,15 +126,18 @@ const CreateWalletForm = () => {
       errors.shares = 'Enter a valid number of shares'
     }
 
-    if (values.acceptSPL && !values.pubKeySPL) {
-      errors.pubKeySPL = 'This field is required'
-    }
+    if (values.acceptSPL)
+      values.pubKeySPL
+        ? isValidPubKey(values.pubKeySPL)
+          ? (errors.pubKeySPL = 'Please enter a valid public key')
+          : null
+        : (errors.pubKeySPL = 'This field is required')
 
     return errors
   }
 
   const checkNumeric = (event: any) => {
-    if (event.key == '.') {
+    if (event.key == '.' || event.key == '-') {
       event.preventDefault()
     }
   }
@@ -185,6 +189,7 @@ const CreateWalletForm = () => {
           </label>
           <input
             type="number"
+            min="1"
             id="shares"
             placeholder="Enter a number of shares"
             className="input input-bordered w-full"
