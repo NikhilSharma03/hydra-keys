@@ -14,10 +14,10 @@ import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
 import FundWalletModal from './FundWalletModal'
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
-import { FanoutClient } from '@glasseaters/hydra-sdk'
+import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
 import { PublicKey, Transaction } from '@solana/web3.js'
 import FormStateAlert, { FormState } from './FormStateAlert'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
 import { useEffect, useState } from 'react'
@@ -36,11 +36,16 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const [formState, setFormState] = useState('idle' as FormState)
   const [showUpdateSPL, setShowUpdateSPL] = useState(false)
   const [wallet, setWallet] = useState(initialWallet)
+  const [availableShares, setAvailableShares] = useState(initialWallet.totalShares)
   const [errorMsg, setErrorMsg] = useState('')
   const [logs, setLogs] = useState([])
   const { connection } = useConnection()
   const anchorwallet = useAnchorWallet()
   const [balance, setBalance] = useState()
+
+  useEffect(() => {
+    console.log('Available shares: ', availableShares);
+  }, [availableShares]);
 
   const toggleUpdateSPL = () => {
     setShowUpdateSPL(!showUpdateSPL)
@@ -125,6 +130,42 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     }
   }
 
+  const handleRefresh = async () => {
+    setFormState('submitting')
+    if (!anchorwallet) {
+      return
+    }
+
+    try {
+      setLogs([])
+      const fanoutSdk = new FanoutClient(connection, anchorwallet)
+      const [fanoutPubkey] = await FanoutClient.fanoutKey(wallet.name)
+
+      console.log(wallet.name)
+      console.log(fanoutPubkey)
+      // console.log('refreshed')
+      // console.log(wallet.pubkey)
+
+      const fanoutObject = await fanoutSdk.fetch<Fanout>(fanoutPubkey, Fanout);
+   
+ 
+      console.log(fanoutObject)
+      console.log(fanoutObject.totalMembers.toString())
+      console.log(fanoutObject.totalAvailableShares.toString())
+      console.log(fanoutObject.totalInflow.toString())
+      
+     setAvailableShares(fanoutObject.totalAvailableShares.toString())
+
+      setTimeout(function () {
+        setFormState('idle')
+      }, 1000)
+    } catch (error: any) {
+      console.log(error)
+      setLogs(error.logs)
+      setFormState('error')
+      setErrorMsg(`Failed to distribute wallet funds: ${error.message}`)
+    }
+  }
 
   return (
     <div className="w-full flex flex-col gap-8">
@@ -158,6 +199,13 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         </button>
       </Link>
 
+      <button
+        onClick={handleRefresh}
+        className="self-start flex gap-2 items-center text-lg btn dark:bg-secondary dark:text-secondary-content"
+      >
+        <p className="">Refresh</p>
+      </button>
+
       <div className="flex justify-between relative items-end w-full">
         <div className="group">
           <div className="absolute transition-opacity duration-300 opacity-0 group-hover:opacity-40 flex justify-center h-full items-center -left-6">
@@ -181,7 +229,9 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
           </div>
 
           <p>Total shares: {wallet.totalShares}</p>
+          <p>Available shares: {availableShares}</p>
         </div>
+
         <FormStateAlert
           state={formState}
           submittingMsg="Distributing funds"
