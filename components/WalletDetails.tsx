@@ -60,7 +60,10 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
            nativeAccountPubkey
        )
       
-       setBalance(nativeAccountInfo?.lamports / LAMPORTS_PER_SOL)
+       const Rentbalance =
+                await connection.getMinimumBalanceForRentExemption(1);
+      
+      setBalance((nativeAccountInfo?.lamports - Rentbalance)/ LAMPORTS_PER_SOL)
      })()
    }, [connection, wallet.pubkey])
   
