@@ -9,20 +9,22 @@ import {
 import AddMemberModal from './AddMemberModal'
 import MembersTable from './MembersTable'
 import EditSPLToken from "./EditSPLToken";
-
+import FundWalletModal from './FundWalletModal'
 import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
-import FundWalletModal from './FundWalletModal'
-import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
-import { FanoutClient } from '@glasseaters/hydra-sdk'
-import { PublicKey, Transaction } from '@solana/web3.js'
+
+import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
+import { useEffect, useState } from 'react'
+import { useConnection, useAnchorWallet} from '@solana/wallet-adapter-react'
+import { LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 import FormStateAlert, { FormState } from './FormStateAlert'
-import { useState } from 'react'
+
 
 type WalletDetailsProps = {
   initialWallet: any
   members: any
 }
+
 
 const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const [formState, setFormState] = useState('idle' as FormState)
@@ -32,6 +34,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const [logs, setLogs] = useState([])
   const { connection } = useConnection()
   const anchorwallet = useAnchorWallet()
+  const [balance, setBalance] = useState()
 
   const toggleUpdateSPL = () => {
     setShowUpdateSPL(!showUpdateSPL)
@@ -45,6 +48,25 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     setWallet(newWallet)
   }
 
+ //Derive Balance, totalavailableshares, totalinflow from blockchain
+   useEffect(() => {
+     (async () => {
+       const fanout = await Fanout.fromAccountAddress(
+         connection,
+         new PublicKey(wallet.pubkey)
+       )
+       const nativeAccountPubkey = fanout.accountKey
+       const nativeAccountInfo = await connection.getAccountInfo(
+           nativeAccountPubkey
+       )
+      
+       const Rentbalance =
+                await connection.getMinimumBalanceForRentExemption(1);
+      
+      setBalance((nativeAccountInfo?.lamports - Rentbalance)/ LAMPORTS_PER_SOL)
+     })()
+   }, [connection, wallet.pubkey])
+  
   const handleDistribute = async (memberPubkey) => {
     setFormState('submitting')
     if (!anchorwallet) {
@@ -96,6 +118,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       setErrorMsg(`Failed to distribute wallet funds: ${error.message}`)
     }
   }
+
 
   return (
     <div className="w-full flex flex-col gap-8">
@@ -189,6 +212,11 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         <div className="flex justify-between">
           <p>Membership model: </p>
           <p>{wallet.memberShipType}</p>
+        </div>
+
+        <div className="flex justify-between">
+          <p>Current Balance: </p>
+          <p>{balance}</p>
         </div>
 
         <div className="flex w-full justify-between flex-wrap gap-y-5">
