@@ -23,11 +23,10 @@ import FormStateAlert, { FormState } from './FormStateAlert'
 type WalletDetailsProps = {
   initialWallet: any
   members: any
-  wallet: any
 }
 
 
-const WalletDetails = ({ wallet, initialWallet, members }: WalletDetailsProps) => {
+const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const [formState, setFormState] = useState('idle' as FormState)
   const [showUpdateSPL, setShowUpdateSPL] = useState(false)
   const [wallet, setWallet] = useState(initialWallet)
