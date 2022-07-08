@@ -34,7 +34,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const [logs, setLogs] = useState([])
   const { connection } = useConnection()
   const anchorwallet = useAnchorWallet()
-  const [balance, setBalance] = useState()
+  const [balance, setBalance] = useState(0)
 
   const toggleUpdateSPL = () => {
     setShowUpdateSPL(!showUpdateSPL)
@@ -63,7 +63,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
        const Rentbalance =
                 await connection.getMinimumBalanceForRentExemption(1);
       
-      setBalance((nativeAccountInfo?.lamports - Rentbalance)/ LAMPORTS_PER_SOL)
+      setBalance(((nativeAccountInfo?.lamports ?? 0) - Rentbalance)/ LAMPORTS_PER_SOL)
      })()
    }, [connection, wallet.pubkey])
   
