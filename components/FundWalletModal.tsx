@@ -53,6 +53,8 @@ const FundWalletModal = ({ modalId, hydraWallet }: FundWalletModalProps) => {
     }
 
     try {
+      setErrorLogs([])
+
       // Prepare transaction
       const tx = new Transaction()
       const ixTransfer = SystemProgram.transfer({
