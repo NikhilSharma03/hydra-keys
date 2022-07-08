@@ -17,6 +17,7 @@ import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
 import { useEffect, useState } from 'react'
 import { useConnection, useAnchorWallet} from '@solana/wallet-adapter-react'
 import { LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
+import { NATIVE_MINT } from '@solana/spl-token'
 import FormStateAlert, { FormState } from './FormStateAlert'
 
 
@@ -119,6 +120,33 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     }
   }
 
+  const distributeAll = async () => {
+    if (!anchorwallet) {
+      setFormState('error')
+      setErrorMsg('Please connect your wallet!')
+      return
+    }
+
+    try {
+      setFormState('submitting')
+      setLogs([])
+
+      const fanoutSdk = new FanoutClient(connection, anchorwallet)
+
+      await fanoutSdk.distributeAll({
+        fanout: new PublicKey(wallet.pubkey),
+        payer: anchorwallet.publicKey,
+        mint: NATIVE_MINT
+      })
+
+      setFormState('success')
+    } catch (error: any) {
+      console.error(error)
+      setLogs(error.logs)
+      setFormState('error')
+      setErrorMsg(`Failed to distribute wallet funds: ${error.message}`)
+    }
+  }
 
   return (
     <div className="w-full flex flex-col gap-8">
@@ -131,6 +159,13 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         </div>
 
         <div className=" w-full md:w-1/3 flex justify-center md:justify-end gap-2">
+          <button
+            className="btn btn-secondary"
+            onClick={distributeAll}
+            disabled={formState === 'submitting'}
+          >
+            Distribute All
+          </button>
           <label htmlFor="fund-wallet-modal" className="btn btn-secondary">
             Fund Wallet
           </label>
