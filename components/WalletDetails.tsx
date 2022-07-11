@@ -8,15 +8,20 @@ import {
 } from 'react-icons/fa'
 import AddMemberModal from './AddMemberModal'
 import MembersTable from './MembersTable'
-import EditSPLToken from "./EditSPLToken";
+import EditSPLToken from './EditSPLToken'
 import FundWalletModal from './FundWalletModal'
 import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
 
 import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
 import { useEffect, useState } from 'react'
-import { useConnection, useAnchorWallet} from '@solana/wallet-adapter-react'
-import { LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
+import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
+import {
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+} from '@solana/web3.js'
 import FormStateAlert, { FormState } from './FormStateAlert'
 
 type WalletDetailsProps = {
@@ -55,24 +60,6 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     setWallet(newWallet)
   }
 
- //Derive Balance, totalavailableshares, totalinflow from blockchain
- useEffect(() => {
-  (async () => {
-    const fanout = await Fanout.fromAccountAddress(
-      connection,
-      new PublicKey(wallet.pubkey)
-    )
-    const nativeAccountPubkey = fanout.accountKey
-    const nativeAccountInfo = await connection.getAccountInfo(
-        nativeAccountPubkey
-    )
-   
-    const Rentbalance =
-             await connection.getMinimumBalanceForRentExemption(1);
-   
-   setBalance((nativeAccountInfo?.lamports - Rentbalance)/ LAMPORTS_PER_SOL)
-  })()
-}, [connection, wallet.pubkey])
   const handleDistribute = async (memberPubkey) => {
     setFormState('submitting')
     if (!anchorwallet) {
@@ -147,6 +134,15 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       console.log(fanoutObject.totalMembers.toString())
       console.log(fanoutObject.totalAvailableShares.toString())
       console.log(fanoutObject.totalInflow.toString())
+
+      const nativeAccountPubkey = fanoutObject.accountKey
+      const nativeAccountInfo = await connection.getAccountInfo(
+        nativeAccountPubkey
+      )
+
+      const Rentbalance = await connection.getMinimumBalanceForRentExemption(1)
+
+      setBalance((nativeAccountInfo?.lamports - Rentbalance) / LAMPORTS_PER_SOL)
 
       setAvailableShares(fanoutObject.totalAvailableShares.toString())
 
@@ -227,8 +223,8 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
           </div>
           <div className="justify-between w-0.25">
             <p>
-              Total shares: {wallet.totalShares} &nbsp; &nbsp;Available shares:{' '}
-              {availableShares}
+              Available shares: {availableShares} &nbsp; &nbsp; Total shares:{' '}
+              {wallet.totalShares}
             </p>
           </div>
         </div>
