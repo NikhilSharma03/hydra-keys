@@ -93,7 +93,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     fetchData()
       // make sure to catch any error
       .catch(console.error)
-  }, [fetchData,members])
+  }, [fetchData, members])
 
 
   ///toogle updateSPL
@@ -224,10 +224,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
             <p className="text-xl font-bold ">Members</p>
           </div>
           <div className="justify-between w-0.25">
-            <p>
-              Available shares: {availableShares} &nbsp; &nbsp; Total shares:{' '}
-              {wallet.totalShares}
-            </p>
+            <p><span className="border-2 p-1 rounded-lg border-[#3F3D56]">Available shares: <strong>{availableShares}</strong></span>&nbsp; <span className="text-2xl">|</span> &nbsp;<span className="border-2 p-1 rounded-lg border-[#3F3D56]">Total shares: <strong>{wallet.totalShares}</strong></span></p>
           </div>
         </div>
 
@@ -292,9 +289,8 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
                   No
                   <FaRegEdit
                     onClick={toggleUpdateSPL}
-                    className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${
-                      showUpdateSPL ? 'hidden' : 'inline'
-                    }`}
+                    className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${showUpdateSPL ? 'hidden' : 'inline'
+                      }`}
                   />
                 </div>
               )}
