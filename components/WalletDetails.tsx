@@ -233,7 +233,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         <button
           className={`btn ${styles.distributeBtn}`}
           onClick={distributeAll}
-          disabled={formState === 'submitting'}
+          disabled={formState === 'submitting' || members.length === 0}
         >
           Distribute All
         </button>
