@@ -93,7 +93,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     fetchData()
       // make sure to catch any error
       .catch(console.error)
-  }, [fetchData, members])
+  }, [members.length, fetchData])
 
 
   ///toogle updateSPL
