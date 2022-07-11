@@ -43,13 +43,13 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
 
 
 
-  //toogle refresh page on fund distribution
+  //toggle refresh page on fund distribution
   const updateRefresh = (newRefresh: { msg: string }) => {
   setRefresh(newRefresh)
-}
+  }
 
 
-    //refresh function
+  //refresh function
   const fetchData = useCallback(async () => {
     setFormState2('submitting')
     if (!anchorwallet) {
@@ -68,7 +68,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         nativeAccountPubkey
       )
       const Rentbalance = await connection.getMinimumBalanceForRentExemption(1)
-      setBalance((nativeAccountInfo?.lamports - Rentbalance) / LAMPORTS_PER_SOL)
+      setBalance((nativeAccountInfo?.lamports ?? 0 - Rentbalance) / LAMPORTS_PER_SOL)
       setAvailableShares(fanoutObject.totalAvailableShares.toString())
       setTimeout(function () {
         setFormState2('idle')
@@ -90,7 +90,12 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [members.length, anchorwallet, connection, wallet.name, refresh])
 
-  ///toogle updateSPL
+
+  const isAuthority = () => {
+    return anchorwallet?.publicKey == wallet.authority
+  }
+
+  //toggle updateSPL
   const toggleUpdateSPL = () => {
     setShowUpdateSPL(!showUpdateSPL)
   }
@@ -103,6 +108,26 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     newWallet.splToken = pubKeySPL
     setWallet(newWallet)
   }
+
+  //Derive Balance, totalavailableshares, totalinflow from blockchain
+  useEffect(() => {
+    ;(async () => {
+      const fanout = await Fanout.fromAccountAddress(
+        connection,
+        new PublicKey(wallet.pubkey)
+      )
+      const nativeAccountPubkey = fanout.accountKey
+      const nativeAccountInfo = await connection.getAccountInfo(
+        nativeAccountPubkey
+      )
+
+      const Rentbalance = await connection.getMinimumBalanceForRentExemption(1)
+
+      setBalance(
+        ((nativeAccountInfo?.lamports ?? 0) - Rentbalance) / LAMPORTS_PER_SOL
+      )
+    })()
+  }, [connection, wallet.pubkey])
 
   const handleDistribute = async (memberPubkey) => {
     setFormState('submitting')
@@ -172,7 +197,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       await fanoutSdk.distributeAll({
         fanout: new PublicKey(wallet.pubkey),
         payer: anchorwallet.publicKey,
-        mint: NATIVE_MINT
+        mint: NATIVE_MINT,
       })
 
       setFormState('success')
@@ -194,18 +219,20 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
           <span className="break-words">{wallet.pubkey}</span>
         </div>
 
-        <div className=" w-full md:w-1/3 flex justify-center md:justify-end gap-2">
+        <div className="w-full md:w-1/3 flex justify-center md:justify-end gap-2">
           <label htmlFor="fund-wallet-modal" className="btn btn-secondary">
             Fund Wallet
           </label>
-          <div className="tooltip tooltip-secondary" data-tip="Add members">
-            <label
-              htmlFor="add-member-modal"
-              className="bg-secondary cursor-pointer h-12 w-12 flex hover:brightness-90 justify-center items-center rounded-lg"
-            >
-              <FaUserPlus className="text-white text-xl" />
-            </label>
-          </div>
+          {isAuthority() ? (
+            <div className="tooltip tooltip-secondary" data-tip="Add members">
+              <label
+                htmlFor="add-member-modal"
+                className="bg-secondary cursor-pointer h-12 w-12 flex hover:brightness-90 justify-center items-center rounded-lg"
+              >
+                <FaUserPlus className="text-white text-xl" />
+              </label>
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -232,7 +259,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
           <p className="text-xl font-bold">Authority</p>
         </div>
 
-        <p>{wallet.authority}</p>
+        <p>{isAuthority() ? 'You' : wallet.authority}</p>
       </div>
 
       <div>
@@ -327,12 +354,14 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
               ) : (
                 <div className="flex gap-10">
                   No
-                  <FaRegEdit
-                    onClick={toggleUpdateSPL}
-                    className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${
-                      showUpdateSPL ? 'hidden' : 'inline'
-                    }`}
-                  />
+                  {isAuthority() ? (
+                    <FaRegEdit
+                      onClick={toggleUpdateSPL}
+                      className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${
+                        showUpdateSPL ? 'hidden' : 'inline'
+                      }`}
+                    />
+                  ) : null}
                 </div>
               )}
             </div>
@@ -365,4 +394,4 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   )
 }
 
-export default WalletDetails
+export default WalletDetails;
