@@ -231,7 +231,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       <div className="flex flex-row justify-between items-center font-bold px-8">
         <span>Total Members: {members.length}</span>
         <button
-          className={`btn ${styles.distributeBtn}`}
+          className={`btn bg-[#009000] hover:bg-[#007000] text-white`}
           onClick={distributeAll}
           disabled={formState === 'submitting' || members.length === 0}
         >
