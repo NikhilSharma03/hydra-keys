@@ -159,13 +159,6 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         </div>
 
         <div className=" w-full md:w-1/3 flex justify-center md:justify-end gap-2">
-          <button
-            className="btn btn-secondary"
-            onClick={distributeAll}
-            disabled={formState === 'submitting'}
-          >
-            Distribute All
-          </button>
           <label htmlFor="fund-wallet-modal" className="btn btn-secondary">
             Fund Wallet
           </label>
@@ -233,6 +226,17 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
             </p>
           )}
         </div>
+      </div>
+
+      <div className="flex flex-row justify-between items-center font-bold px-8">
+        <span>Total Members: {members.length}</span>
+        <button
+          className={`btn ${styles.distributeBtn}`}
+          onClick={distributeAll}
+          disabled={formState === 'submitting'}
+        >
+          Distribute All
+        </button>
       </div>
 
       <div className="flex flex-col gap-5">
