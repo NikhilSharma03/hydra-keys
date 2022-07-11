@@ -8,24 +8,27 @@ import {
 } from 'react-icons/fa'
 import AddMemberModal from './AddMemberModal'
 import MembersTable from './MembersTable'
-import EditSPLToken from "./EditSPLToken";
+import EditSPLToken from './EditSPLToken'
 import FundWalletModal from './FundWalletModal'
 import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
 
 import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
 import { useEffect, useState } from 'react'
-import { useConnection, useAnchorWallet} from '@solana/wallet-adapter-react'
-import { LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
+import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
+import {
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+} from '@solana/web3.js'
 import { NATIVE_MINT } from '@solana/spl-token'
 import FormStateAlert, { FormState } from './FormStateAlert'
-
 
 type WalletDetailsProps = {
   initialWallet: any
   members: any
 }
-
 
 const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const [formState, setFormState] = useState('idle' as FormState)
@@ -37,37 +40,42 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const anchorwallet = useAnchorWallet()
   const [balance, setBalance] = useState(0)
 
+  const isAuthority = () => {
+    return anchorwallet?.publicKey == wallet.authority
+  }
+
   const toggleUpdateSPL = () => {
     setShowUpdateSPL(!showUpdateSPL)
   }
 
   const updateWallet = (pubKeySPL) => {
     toggleUpdateSPL()
-    const newWallet = {...wallet}
+    const newWallet = { ...wallet }
     newWallet.acceptSPL = true
     newWallet.splToken = pubKeySPL
     setWallet(newWallet)
   }
 
- //Derive Balance, totalavailableshares, totalinflow from blockchain
-   useEffect(() => {
-     (async () => {
-       const fanout = await Fanout.fromAccountAddress(
-         connection,
-         new PublicKey(wallet.pubkey)
-       )
-       const nativeAccountPubkey = fanout.accountKey
-       const nativeAccountInfo = await connection.getAccountInfo(
-           nativeAccountPubkey
-       )
-      
-       const Rentbalance =
-                await connection.getMinimumBalanceForRentExemption(1);
-      
-      setBalance(((nativeAccountInfo?.lamports ?? 0) - Rentbalance)/ LAMPORTS_PER_SOL)
-     })()
-   }, [connection, wallet.pubkey])
-  
+  //Derive Balance, totalavailableshares, totalinflow from blockchain
+  useEffect(() => {
+    ;(async () => {
+      const fanout = await Fanout.fromAccountAddress(
+        connection,
+        new PublicKey(wallet.pubkey)
+      )
+      const nativeAccountPubkey = fanout.accountKey
+      const nativeAccountInfo = await connection.getAccountInfo(
+        nativeAccountPubkey
+      )
+
+      const Rentbalance = await connection.getMinimumBalanceForRentExemption(1)
+
+      setBalance(
+        ((nativeAccountInfo?.lamports ?? 0) - Rentbalance) / LAMPORTS_PER_SOL
+      )
+    })()
+  }, [connection, wallet.pubkey])
+
   const handleDistribute = async (memberPubkey) => {
     setFormState('submitting')
     if (!anchorwallet) {
@@ -136,7 +144,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       await fanoutSdk.distributeAll({
         fanout: new PublicKey(wallet.pubkey),
         payer: anchorwallet.publicKey,
-        mint: NATIVE_MINT
+        mint: NATIVE_MINT,
       })
 
       setFormState('success')
@@ -158,18 +166,20 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
           <span className="break-words">{wallet.pubkey}</span>
         </div>
 
-        <div className=" w-full md:w-1/3 flex justify-center md:justify-end gap-2">
+        <div className="w-full md:w-1/3 flex justify-center md:justify-end gap-2">
           <label htmlFor="fund-wallet-modal" className="btn btn-secondary">
             Fund Wallet
           </label>
-          <div className="tooltip tooltip-secondary" data-tip="Add members">
-            <label
-              htmlFor="add-member-modal"
-              className="bg-secondary cursor-pointer h-12 w-12 flex hover:brightness-90 justify-center items-center rounded-lg"
-            >
-              <FaUserPlus className="text-white text-xl" />
-            </label>
-          </div>
+          {isAuthority() ? (
+            <div className="tooltip tooltip-secondary" data-tip="Add members">
+              <label
+                htmlFor="add-member-modal"
+                className="bg-secondary cursor-pointer h-12 w-12 flex hover:brightness-90 justify-center items-center rounded-lg"
+              >
+                <FaUserPlus className="text-white text-xl" />
+              </label>
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -189,7 +199,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
           <p className="text-xl font-bold">Authority</p>
         </div>
 
-        <p>{wallet.authority}</p>
+        <p>{isAuthority() ? 'You' : wallet.authority}</p>
       </div>
 
       <div>
@@ -262,15 +272,19 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
           <div className="flex justify-between w-full md:w-1/3">
             <p>Accept SPL token: </p>
             <div className="text-primary">
-              {wallet.acceptSPL ? <span>Accept</span> : (
+              {wallet.acceptSPL ? (
+                <span>Accept</span>
+              ) : (
                 <div className="flex gap-10">
                   No
-                  <FaRegEdit
-                    onClick={toggleUpdateSPL}
-                    className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${
-                      showUpdateSPL ? 'hidden' : 'inline'
-                    }`}
-                  />
+                  {isAuthority() ? (
+                    <FaRegEdit
+                      onClick={toggleUpdateSPL}
+                      className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${
+                        showUpdateSPL ? 'hidden' : 'inline'
+                      }`}
+                    />
+                  ) : null}
                 </div>
               )}
             </div>
@@ -285,7 +299,11 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         </div>
 
         <div className={`w-full ${showUpdateSPL ? 'block' : 'hidden'}`}>
-          <EditSPLToken onCancel={toggleUpdateSPL} onSuccess={updateWallet} hydraPubKey={wallet.pubkey}/>
+          <EditSPLToken
+            onCancel={toggleUpdateSPL}
+            onSuccess={updateWallet}
+            hydraPubKey={wallet.pubkey}
+          />
         </div>
       </div>
 
