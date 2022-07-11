@@ -14,7 +14,7 @@ import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
 
 import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
 import {
   LAMPORTS_PER_SOL,
@@ -44,14 +44,64 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const anchorwallet = useAnchorWallet()
   const [balance, setBalance] = useState()
 
-  useEffect(() => {
-    handleRefresh()
-  }, [members])
+  const fetchData = useCallback(async () => {
+    setFormState2('submitting')
+    if (!anchorwallet) {
+      return
+    }
 
+    try {
+      setLogs([])
+      const fanoutSdk = new FanoutClient(connection, anchorwallet)
+      const [fanoutPubkey] = await FanoutClient.fanoutKey(wallet.name)
+
+      console.log(wallet.name)
+      console.log(fanoutPubkey)
+      // console.log('refreshed')
+      // console.log(wallet.pubkey)
+
+      const fanoutObject = await fanoutSdk.fetch<Fanout>(fanoutPubkey, Fanout)
+
+      console.log(fanoutObject)
+      console.log(fanoutObject.totalMembers.toString())
+      console.log(fanoutObject.totalAvailableShares.toString())
+      console.log(fanoutObject.totalInflow.toString())
+
+      const nativeAccountPubkey = fanoutObject.accountKey
+      const nativeAccountInfo = await connection.getAccountInfo(
+        nativeAccountPubkey
+      )
+
+      const Rentbalance = await connection.getMinimumBalanceForRentExemption(1)
+
+      setBalance((nativeAccountInfo?.lamports - Rentbalance) / LAMPORTS_PER_SOL)
+
+      setAvailableShares(fanoutObject.totalAvailableShares.toString())
+
+      setTimeout(function () {
+        setFormState2('idle')
+      }, 1000)
+    } catch (error: any) {
+      console.log(error)
+      setLogs(error.logs)
+      setFormState2('error')
+      setErrorMsg(`Failed to refresh: ${error.message}`)
+    }
+  }, [anchorwallet, connection, wallet.name])
+
+  useEffect(() => {
+    fetchData()
+      // make sure to catch any error
+      .catch(console.error)
+  }, [fetchData,members])
+
+
+  ///toogle updateSPL
   const toggleUpdateSPL = () => {
     setShowUpdateSPL(!showUpdateSPL)
   }
 
+  //updateWallet
   const updateWallet = (pubKeySPL) => {
     toggleUpdateSPL()
     const newWallet = { ...wallet }
@@ -60,6 +110,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     setWallet(newWallet)
   }
 
+  //handle distribute
   const handleDistribute = async (memberPubkey) => {
     setFormState('submitting')
     if (!anchorwallet) {
@@ -112,55 +163,6 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     }
   }
 
-  const handleRefresh = async () => {
-    setFormState2('submitting')
-    if (!anchorwallet) {
-      return
-    }
-
-    try {
-      setLogs([])
-      const fanoutSdk = new FanoutClient(connection, anchorwallet)
-      const [fanoutPubkey] = await FanoutClient.fanoutKey(wallet.name)
-
-      console.log(wallet.name)
-      console.log(fanoutPubkey)
-      // console.log('refreshed')
-      // console.log(wallet.pubkey)
-
-      const fanoutObject = await fanoutSdk.fetch<Fanout>(fanoutPubkey, Fanout)
-
-      console.log(fanoutObject)
-      console.log(fanoutObject.totalMembers.toString())
-      console.log(fanoutObject.totalAvailableShares.toString())
-      console.log(fanoutObject.totalInflow.toString())
-
-      const nativeAccountPubkey = fanoutObject.accountKey
-      const nativeAccountInfo = await connection.getAccountInfo(
-        nativeAccountPubkey
-      )
-
-      const Rentbalance = await connection.getMinimumBalanceForRentExemption(1)
-
-      setBalance((nativeAccountInfo?.lamports - Rentbalance) / LAMPORTS_PER_SOL)
-
-      setAvailableShares(fanoutObject.totalAvailableShares.toString())
-
-      if (+fanoutObject.totalMembers.toString() != 0) {
-        console.log('different')
-      }
-
-      setTimeout(function () {
-        setFormState2('idle')
-      }, 1000)
-    } catch (error: any) {
-      console.log(error)
-      setLogs(error.logs)
-      setFormState2('error')
-      setErrorMsg(`Failed to refresh: ${error.message}`)
-    }
-  }
-
   return (
     <div className="w-full flex flex-col gap-8">
       <div className="flex justify-between flex-wrap gap-5 md:gap-0 pb-2">
@@ -194,7 +196,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       </Link>
 
       <button
-        onClick={handleRefresh}
+        onClick={() => fetchData()}
         className="self-start flex gap-2 items-center text-lg btn dark:bg-secondary dark:text-secondary-content"
       >
         <p className="">Refresh</p>
