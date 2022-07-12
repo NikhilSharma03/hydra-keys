@@ -58,6 +58,8 @@ const FundWalletModal = ({
     }
 
     try {
+      setErrorLogs([])
+
       // Prepare transaction
       const tx = new Transaction()
       const ixTransfer = SystemProgram.transfer({

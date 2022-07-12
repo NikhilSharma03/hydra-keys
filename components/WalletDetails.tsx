@@ -12,16 +12,11 @@ import EditSPLToken from './EditSPLToken'
 import FundWalletModal from './FundWalletModal'
 import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
-
 import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
 import { useCallback, useEffect, useState } from 'react'
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
-import {
-  LAMPORTS_PER_SOL,
-  PublicKey,
-  SystemProgram,
-  Transaction,
-} from '@solana/web3.js'
+import { LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
+import { NATIVE_MINT } from '@solana/spl-token'
 import FormStateAlert, { FormState } from './FormStateAlert'
 
 type WalletDetailsProps = {
@@ -44,7 +39,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const [logs, setLogs] = useState([])
   const { connection } = useConnection()
   const anchorwallet = useAnchorWallet()
-  const [balance, setBalance] = useState()
+  const [balance, setBalance] = useState(0)
 
 
     //toogle refresh page on fund distribution
@@ -161,6 +156,34 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     }
   }
 
+  const distributeAll = async () => {
+    if (!anchorwallet) {
+      setFormState('error')
+      setErrorMsg('Please connect your wallet!')
+      return
+    }
+
+    try {
+      setFormState('submitting')
+      setLogs([])
+
+      const fanoutSdk = new FanoutClient(connection, anchorwallet)
+
+      await fanoutSdk.distributeAll({
+        fanout: new PublicKey(wallet.pubkey),
+        payer: anchorwallet.publicKey,
+        mint: NATIVE_MINT
+      })
+
+      setFormState('success')
+    } catch (error: any) {
+      console.error(error)
+      setLogs(error.logs)
+      setFormState('error')
+      setErrorMsg(`Failed to distribute wallet funds: ${error.message}`)
+    }
+  }
+
   return (
     <div className="w-full flex flex-col gap-8">
       <div className="flex justify-between flex-wrap gap-5 md:gap-0 pb-2">
@@ -263,6 +286,17 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
             </p>
           )}
         </div>
+      </div>
+
+      <div className="flex flex-row justify-between items-center font-bold px-8">
+        <span>Total Members: {members.length}</span>
+        <button
+          className={`btn bg-[#009000] hover:bg-[#007000] text-white`}
+          onClick={distributeAll}
+          disabled={formState === 'submitting' || members.length === 0}
+        >
+          Distribute All
+        </button>
       </div>
 
       <div className="flex flex-col gap-5">
