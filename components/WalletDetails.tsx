@@ -42,10 +42,11 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const [balance, setBalance] = useState(0)
 
 
-    //toogle refresh page on fund distribution
-    const updateRefresh = (newRefresh: { msg: string }) => {
-      setRefresh(newRefresh)
-    }
+
+  //toogle refresh page on fund distribution
+  const updateRefresh = (newRefresh: { msg: string }) => {
+  setRefresh(newRefresh)
+}
 
 
     //refresh function
@@ -103,7 +104,6 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     setWallet(newWallet)
   }
 
-  //handle distribute
   const handleDistribute = async (memberPubkey) => {
     setFormState('submitting')
     if (!anchorwallet) {
