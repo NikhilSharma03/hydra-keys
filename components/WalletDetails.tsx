@@ -55,29 +55,15 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       const fanoutSdk = new FanoutClient(connection, anchorwallet)
       const [fanoutPubkey] = await FanoutClient.fanoutKey(wallet.name)
 
-      console.log(wallet.name)
-      console.log(fanoutPubkey)
-      // console.log('refreshed')
-      // console.log(wallet.pubkey)
-
       const fanoutObject = await fanoutSdk.fetch<Fanout>(fanoutPubkey, Fanout)
-
-      console.log(fanoutObject)
-      console.log(fanoutObject.totalMembers.toString())
-      console.log(fanoutObject.totalAvailableShares.toString())
-      console.log(fanoutObject.totalInflow.toString())
 
       const nativeAccountPubkey = fanoutObject.accountKey
       const nativeAccountInfo = await connection.getAccountInfo(
         nativeAccountPubkey
       )
-
       const Rentbalance = await connection.getMinimumBalanceForRentExemption(1)
-
       setBalance((nativeAccountInfo?.lamports - Rentbalance) / LAMPORTS_PER_SOL)
-
       setAvailableShares(fanoutObject.totalAvailableShares.toString())
-
       setTimeout(function () {
         setFormState2('idle')
       }, 1000)
@@ -93,8 +79,8 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     fetchData()
       // make sure to catch any error
       .catch(console.error)
-  }, [members.length, fetchData])
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [members.length])
 
   ///toogle updateSPL
   const toggleUpdateSPL = () => {
@@ -224,7 +210,15 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
             <p className="text-xl font-bold ">Members</p>
           </div>
           <div className="justify-between w-0.25">
-            <p><span className="border-2 p-1 rounded-lg border-[#3F3D56]">Available shares: <strong>{availableShares}</strong></span>&nbsp; <span className="text-2xl">|</span> &nbsp;<span className="border-2 p-1 rounded-lg border-[#3F3D56]">Total shares: <strong>{wallet.totalShares}</strong></span></p>
+            <p>
+              <span className="border-2 p-1 rounded-lg border-[#3F3D56]">
+                Available shares: <strong>{availableShares}</strong>
+              </span>
+              &nbsp; <span className="text-2xl">|</span> &nbsp;
+              <span className="border-2 p-1 rounded-lg border-[#3F3D56]">
+                Total shares: <strong>{wallet.totalShares}</strong>
+              </span>
+            </p>
           </div>
         </div>
 
@@ -289,8 +283,9 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
                   No
                   <FaRegEdit
                     onClick={toggleUpdateSPL}
-                    className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${showUpdateSPL ? 'hidden' : 'inline'
-                      }`}
+                    className={`cursor-pointer opacity-80 hover:opacity-100 text-lg text-white ${
+                      showUpdateSPL ? 'hidden' : 'inline'
+                    }`}
                   />
                 </div>
               )}
