@@ -30,6 +30,9 @@ type WalletDetailsProps = {
 }
 
 const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
+  const [refresh, setRefresh] = useState({
+    msg: 'initial',
+  })
   const [formState, setFormState] = useState('idle' as FormState)
   const [formState2, setFormState2] = useState('idle' as FormState)
   const [showUpdateSPL, setShowUpdateSPL] = useState(false)
@@ -37,13 +40,20 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const [availableShares, setAvailableShares] = useState(
     initialWallet.totalShares
   )
-
   const [errorMsg, setErrorMsg] = useState('')
   const [logs, setLogs] = useState([])
   const { connection } = useConnection()
   const anchorwallet = useAnchorWallet()
   const [balance, setBalance] = useState()
 
+
+    //toogle refresh page on fund distribution
+    const updateRefresh = (newRefresh: { msg: string }) => {
+      setRefresh(newRefresh)
+    }
+
+
+    //refresh function
   const fetchData = useCallback(async () => {
     setFormState2('submitting')
     if (!anchorwallet) {
@@ -73,14 +83,16 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       setFormState2('error')
       setErrorMsg(`Failed to refresh: ${error.message}`)
     }
-  }, [anchorwallet, connection, wallet.name])
+  }, [])
 
+
+  //useEffect for refreshing page
   useEffect(() => {
     fetchData()
       // make sure to catch any error
       .catch(console.error)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [members.length])
+  }, [members.length, anchorwallet, connection, wallet.name, refresh])
 
   ///toogle updateSPL
   const toggleUpdateSPL = () => {
@@ -310,7 +322,11 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       </div>
 
       <AddMemberModal hydraWallet={wallet} />
-      <FundWalletModal modalId="fund-wallet-modal" hydraWallet={wallet} />
+      <FundWalletModal
+        modalId="fund-wallet-modal"
+        hydraWallet={wallet}
+        updateRefresh={updateRefresh}
+      />
     </div>
   )
 }

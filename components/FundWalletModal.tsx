@@ -14,13 +14,18 @@ import FormStateAlert, { FormState } from './FormStateAlert'
 type FundWalletModalProps = {
   modalId: string
   hydraWallet: any
+  updateRefresh: Function
 }
 
 interface FormValues {
   amount: number
 }
 
-const FundWalletModal = ({ modalId, hydraWallet }: FundWalletModalProps) => {
+const FundWalletModal = ({
+  modalId,
+  hydraWallet,
+  updateRefresh,
+}: FundWalletModalProps) => {
   const [formState, setFormState] = useState('idle' as FormState)
   const [errorMsg, setErrorMsg] = useState('')
   const [errorLogs, setErrorLogs] = useState([])
@@ -33,7 +38,7 @@ const FundWalletModal = ({ modalId, hydraWallet }: FundWalletModalProps) => {
   }
 
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       try {
         const [derivedNativeAccount] = await FanoutClient.nativeAccount(
           new PublicKey(hydraWallet.pubkey)
@@ -83,6 +88,7 @@ const FundWalletModal = ({ modalId, hydraWallet }: FundWalletModalProps) => {
         )
       } else {
         setFormState('success')
+        updateRefresh({ msg: 'success' })
         resetForm()
       }
     } catch (error: any) {
