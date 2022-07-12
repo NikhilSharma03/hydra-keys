@@ -8,66 +8,102 @@ import {
 } from 'react-icons/fa'
 import AddMemberModal from './AddMemberModal'
 import MembersTable from './MembersTable'
-import EditSPLToken from "./EditSPLToken";
+import EditSPLToken from './EditSPLToken'
 import FundWalletModal from './FundWalletModal'
 import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
-
 import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
-import { useEffect, useState } from 'react'
-import { useConnection, useAnchorWallet} from '@solana/wallet-adapter-react'
+import { useCallback, useEffect, useState } from 'react'
+import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
 import { LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 import { NATIVE_MINT } from '@solana/spl-token'
 import FormStateAlert, { FormState } from './FormStateAlert'
-
 
 type WalletDetailsProps = {
   initialWallet: any
   members: any
 }
 
-
 const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
+  const [refresh, setRefresh] = useState({
+    msg: 'initial',
+  })
   const [formState, setFormState] = useState('idle' as FormState)
+  const [formState2, setFormState2] = useState('idle' as FormState)
   const [showUpdateSPL, setShowUpdateSPL] = useState(false)
   const [wallet, setWallet] = useState(initialWallet)
+  const [availableShares, setAvailableShares] = useState(
+    initialWallet.totalShares
+  )
   const [errorMsg, setErrorMsg] = useState('')
   const [logs, setLogs] = useState([])
   const { connection } = useConnection()
   const anchorwallet = useAnchorWallet()
   const [balance, setBalance] = useState(0)
 
+
+
+  //toogle refresh page on fund distribution
+  const updateRefresh = (newRefresh: { msg: string }) => {
+  setRefresh(newRefresh)
+}
+
+
+    //refresh function
+  const fetchData = useCallback(async () => {
+    setFormState2('submitting')
+    if (!anchorwallet) {
+      return
+    }
+
+    try {
+      setLogs([])
+      const fanoutSdk = new FanoutClient(connection, anchorwallet)
+      const [fanoutPubkey] = await FanoutClient.fanoutKey(wallet.name)
+
+      const fanoutObject = await fanoutSdk.fetch<Fanout>(fanoutPubkey, Fanout)
+
+      const nativeAccountPubkey = fanoutObject.accountKey
+      const nativeAccountInfo = await connection.getAccountInfo(
+        nativeAccountPubkey
+      )
+      const Rentbalance = await connection.getMinimumBalanceForRentExemption(1)
+      setBalance((nativeAccountInfo?.lamports - Rentbalance) / LAMPORTS_PER_SOL)
+      setAvailableShares(fanoutObject.totalAvailableShares.toString())
+      setTimeout(function () {
+        setFormState2('idle')
+      }, 1000)
+    } catch (error: any) {
+      console.log(error)
+      setLogs(error.logs)
+      setFormState2('error')
+      setErrorMsg(`Failed to refresh: ${error.message}`)
+    }
+  }, [])
+
+
+  //useEffect for refreshing page
+  useEffect(() => {
+    fetchData()
+      // make sure to catch any error
+      .catch(console.error)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [members.length, anchorwallet, connection, wallet.name, refresh])
+
+  ///toogle updateSPL
   const toggleUpdateSPL = () => {
     setShowUpdateSPL(!showUpdateSPL)
   }
 
+  //updateWallet
   const updateWallet = (pubKeySPL) => {
     toggleUpdateSPL()
-    const newWallet = {...wallet}
+    const newWallet = { ...wallet }
     newWallet.acceptSPL = true
     newWallet.splToken = pubKeySPL
     setWallet(newWallet)
   }
 
- //Derive Balance, totalavailableshares, totalinflow from blockchain
-   useEffect(() => {
-     (async () => {
-       const fanout = await Fanout.fromAccountAddress(
-         connection,
-         new PublicKey(wallet.pubkey)
-       )
-       const nativeAccountPubkey = fanout.accountKey
-       const nativeAccountInfo = await connection.getAccountInfo(
-           nativeAccountPubkey
-       )
-      
-       const Rentbalance =
-                await connection.getMinimumBalanceForRentExemption(1);
-      
-      setBalance(((nativeAccountInfo?.lamports ?? 0) - Rentbalance)/ LAMPORTS_PER_SOL)
-     })()
-   }, [connection, wallet.pubkey])
-  
   const handleDistribute = async (memberPubkey) => {
     setFormState('submitting')
     if (!anchorwallet) {
@@ -180,6 +216,13 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         </button>
       </Link>
 
+      <button
+        onClick={() => fetchData()}
+        className="self-start flex gap-2 items-center text-lg btn dark:bg-secondary dark:text-secondary-content"
+      >
+        <p className="">Refresh</p>
+      </button>
+
       <div className="flex justify-between relative items-end w-full">
         <div className="group">
           <div className="absolute transition-opacity duration-300 opacity-0 group-hover:opacity-40 flex justify-center h-full items-center -left-6">
@@ -201,13 +244,30 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
 
             <p className="text-xl font-bold ">Members</p>
           </div>
-
-          <p>Total shares: {wallet.totalShares}</p>
+          <div className="justify-between w-0.25">
+            <p>
+              <span className="border-2 p-1 rounded-lg border-[#3F3D56]">
+                Available shares: <strong>{availableShares}</strong>
+              </span>
+              &nbsp; <span className="text-2xl">|</span> &nbsp;
+              <span className="border-2 p-1 rounded-lg border-[#3F3D56]">
+                Total shares: <strong>{wallet.totalShares}</strong>
+              </span>
+            </p>
+          </div>
         </div>
+
         <FormStateAlert
           state={formState}
           submittingMsg="Distributing funds"
           successMsg="Successfully Distributed!"
+          errorMsg={errorMsg}
+          logs={logs}
+        />
+        <FormStateAlert
+          state={formState2}
+          submittingMsg="Refreshing"
+          successMsg="Success!"
           errorMsg={errorMsg}
           logs={logs}
         />
@@ -221,7 +281,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
               onHandleDistribute={handleDistribute}
             />
           ) : (
-            <p className="text-center text-xl font-bold">
+            <p className="text-center text-xl font-bold mt-5">
               No members please add new members
             </p>
           )}
@@ -262,7 +322,9 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
           <div className="flex justify-between w-full md:w-1/3">
             <p>Accept SPL token: </p>
             <div className="text-primary">
-              {wallet.acceptSPL ? <span>Accept</span> : (
+              {wallet.acceptSPL ? (
+                <span>Accept</span>
+              ) : (
                 <div className="flex gap-10">
                   No
                   <FaRegEdit
@@ -285,12 +347,20 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         </div>
 
         <div className={`w-full ${showUpdateSPL ? 'block' : 'hidden'}`}>
-          <EditSPLToken onCancel={toggleUpdateSPL} onSuccess={updateWallet} hydraPubKey={wallet.pubkey}/>
+          <EditSPLToken
+            onCancel={toggleUpdateSPL}
+            onSuccess={updateWallet}
+            hydraPubKey={wallet.pubkey}
+          />
         </div>
       </div>
 
       <AddMemberModal hydraWallet={wallet} />
-      <FundWalletModal modalId="fund-wallet-modal" hydraWallet={wallet} />
+      <FundWalletModal
+        modalId="fund-wallet-modal"
+        hydraWallet={wallet}
+        updateRefresh={updateRefresh}
+      />
     </div>
   )
 }
