@@ -197,6 +197,11 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       })
 
       setFormState('success')
+      setTimeout(function () {
+        setFormState('idle')
+        fetchData()
+      }, 1000)
+
     } catch (error: any) {
       console.error(error)
       setLogs(error.logs)
