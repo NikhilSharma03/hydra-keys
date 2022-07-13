@@ -203,19 +203,29 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
 
       const fanoutSdk = new FanoutClient(connection, anchorwallet)
 
-      await fanoutSdk.distributeAll({
+      const ixDistAll = await fanoutSdk.distributeAllInstructions({
         fanout: new PublicKey(wallet.pubkey),
         payer: anchorwallet.publicKey,
         mint: NATIVE_MINT,
       })
 
       if (wallet.acceptSPL) {
-        await fanoutSdk.distributeAll({
+        const ixDistAllSPL = await fanoutSdk.distributeAllInstructions({
           fanout: new PublicKey(wallet.pubkey),
           payer: anchorwallet.publicKey,
           mint: new PublicKey(wallet.splToken),
         })
+
+        ixDistAll.instructions = ixDistAll.instructions.concat(
+          ixDistAllSPL.instructions
+        )
+
+        ixDistAll.signers = ixDistAll.signers.concat(
+          ixDistAllSPL.signers
+        )
       }
+
+      await fanoutSdk.executeBig(Promise.resolve(ixDistAll))
 
       setFormState('success')
       setTimeout(function () {
