@@ -41,8 +41,6 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const anchorwallet = useAnchorWallet()
   const [balance, setBalance] = useState(0)
 
-
-
   //toggle refresh page on fund distribution
   const updateRefresh = (newRefresh: { msg: string }) => {
   setRefresh(newRefresh)
@@ -90,12 +88,10 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [members.length, anchorwallet, connection, wallet.name, refresh])
 
-
   const isAuthority = () => {
     return anchorwallet?.publicKey == wallet.authority
   }
 
-  //toggle updateSPL
   const toggleUpdateSPL = () => {
     setShowUpdateSPL(!showUpdateSPL)
   }
