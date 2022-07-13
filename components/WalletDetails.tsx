@@ -148,6 +148,19 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       const tx = new Transaction()
       tx.add(...distMember.instructions)
 
+      // Generate SPL distribution instructions (if wallet accepts SPL tokens)
+      if (wallet.acceptSPL) {
+        let distMemberSPL = await fanoutSdk.distributeWalletMemberInstructions({
+          distributeForMint: true,
+          fanout: new PublicKey(wallet.pubkey),
+          payer: anchorwallet.publicKey,
+          member: new PublicKey(memberPubkey),
+          fanoutMint: new PublicKey(wallet.splToken)
+        })
+
+        tx.add(...distMemberSPL.instructions)
+      }
+
       // Sign transaction using user's wallet
       tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
       tx.feePayer = anchorwallet.publicKey
@@ -195,6 +208,14 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         payer: anchorwallet.publicKey,
         mint: NATIVE_MINT,
       })
+
+      if (wallet.acceptSPL) {
+        await fanoutSdk.distributeAll({
+          fanout: new PublicKey(wallet.pubkey),
+          payer: anchorwallet.publicKey,
+          mint: new PublicKey(wallet.splToken),
+        })
+      }
 
       setFormState('success')
       setTimeout(function () {
