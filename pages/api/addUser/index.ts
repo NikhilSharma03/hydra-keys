@@ -90,11 +90,16 @@ export default async function handler(
           return
         }
       } else if (error instanceof SendTransactionError) {
-        res.status(500).json({
-          msg: error.message,
-          logs: error.logs,
-        })
-        return
+        if (error.logs?.[4].includes('Encountered an arithmetic error')) {
+          res.status(400).json({ msg: 'Excceds total shares' })
+          return
+        } else {
+          res.status(500).json({
+            msg: error.message,
+            logs: error.logs,
+          })
+          return
+        }
       }
 
       res
