@@ -224,9 +224,11 @@ const FundWalletModal = ({
                 {...formik.getFieldProps('amount')}
               />
               <label className="label">
-                <span className="label-text-alt text-red-500">
-                  {formik.errors.amount}
-                </span>
+                {formik.touched.amount ? (
+                  <span className="label-text-alt text-red-500">
+                    {formik.errors.amount}
+                  </span>
+                ) : null}
               </label>
             </div>
             <FormStateAlert
