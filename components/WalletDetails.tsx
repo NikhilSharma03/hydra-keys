@@ -438,7 +438,9 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         </div>
       </div>
 
-      <AddMemberModal hydraWallet={wallet} />
+      <AddMemberModal hydraWallet={wallet}
+        availableShares ={availableShares}
+      />
       <FundWalletModal
         modalId="fund-wallet-modal"
         hydraWallet={wallet}

@@ -11,6 +11,7 @@ import { useSWRConfig } from 'swr'
 
 type AddMemberModalProps = {
   hydraWallet: any
+  availableShares : number
 }
 
 interface FormValues {
@@ -18,7 +19,7 @@ interface FormValues {
   shares: number
 }
 
-const AddMemberModal = ({ hydraWallet }: AddMemberModalProps) => {
+const AddMemberModal = ({ hydraWallet, availableShares }: AddMemberModalProps) => {
   let toggleRef = useRef<HTMLInputElement>(null)
   const { mutate } = useSWRConfig()
 
@@ -43,6 +44,8 @@ const AddMemberModal = ({ hydraWallet }: AddMemberModalProps) => {
       setErrorMsg('Please connect your wallet!')
       return
     }
+
+    
 
     try {
       setLogs([])
@@ -89,6 +92,9 @@ const AddMemberModal = ({ hydraWallet }: AddMemberModalProps) => {
         setFormState('error')
         setErrorMsg(json.msg)
         setLogs(json.logs)
+        setTimeout(function () {
+          setFormState('idle')
+        }, 5000)
       }
     } catch (error: any) {
       setFormState('error')
@@ -107,6 +113,12 @@ const AddMemberModal = ({ hydraWallet }: AddMemberModalProps) => {
     if (!values.shares) {
       errors.shares = 'Enter a valid number of shares'
     }
+
+    if (values.shares > availableShares)
+    {
+      errors.shares = 'Number of shares exceeds available shares'
+    }
+
 
     return errors
   }
