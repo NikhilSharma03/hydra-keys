@@ -66,7 +66,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         nativeAccountPubkey
       )
       const Rentbalance = await connection.getMinimumBalanceForRentExemption(1)
-      setBalance((nativeAccountInfo?.lamports ?? 0 - Rentbalance) / LAMPORTS_PER_SOL)
+      setBalance(((nativeAccountInfo?.lamports ?? 0) - Rentbalance) / LAMPORTS_PER_SOL)
       setAvailableShares(fanoutObject.totalAvailableShares.toString())
       setTimeout(function () {
         setFormState2('idle')
