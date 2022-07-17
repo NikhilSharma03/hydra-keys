@@ -1,31 +1,120 @@
+import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
 import { FormikErrors, useFormik } from 'formik'
+import { useAppSelector } from '../hooks/useAppSelector'
+import { selectCluster } from '../redux/features/wallet/walletSlice'
+import { useState } from 'react'
 import { useRef } from 'react'
+import { FanoutClient } from '@glasseaters/hydra-sdk'
+import { PublicKey, Transaction } from '@solana/web3.js'
+import FormStateAlert, { FormState } from './FormStateAlert'
+import { useSWRConfig } from 'swr'
 
-interface FormValues {
-  pubKey: string
+type AddMemberModalProps = {
+  hydraWallet: any
 }
 
-const AddMemberModal = () => {
+interface FormValues {
+  pubkey: string
+  shares: number
+}
+
+const AddMemberModal = ({ hydraWallet }: AddMemberModalProps) => {
   let toggleRef = useRef<HTMLInputElement>(null)
+  const { mutate } = useSWRConfig()
 
   const initialValues = {
-    pubKey: '',
+    pubkey: '',
+    shares: '',
   }
 
-  const onSubmit = (values: any) => {
+  const { connection } = useConnection()
+  const cluster = useAppSelector(selectCluster)
+  const wallet = useAnchorWallet()
+
+  const [formState, setFormState] = useState('idle' as FormState)
+  const [errorMsg, setErrorMsg] = useState('')
+  const [logs, setLogs] = useState([])
+
+  const onSubmit = async (values: any, { resetForm }) => {
     console.log('submitted', values)
     // add the wallet member here
-    toggleRef.current!.checked = false
+    if (!wallet) {
+      setFormState('error')
+      setErrorMsg('Please connect your wallet!')
+      return
+    }
+
+    try {
+      setLogs([])
+      const fanoutSdk = new FanoutClient(connection, wallet)
+
+      // Prepare transaction
+      const tx = new Transaction()
+      const ixAddMember = await fanoutSdk.addMemberWalletInstructions({
+        fanout: new PublicKey(hydraWallet.pubkey),
+        membershipKey: new PublicKey(values.pubkey),
+        shares: values.shares,
+      })
+      tx.add(...ixAddMember.instructions)
+
+      // Sign transaction using user's wallet
+      tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+      tx.feePayer = wallet.publicKey
+      const txSigned = await wallet.signTransaction(tx)
+
+      //Send API request
+      const res = await fetch('/api/addUser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tx: txSigned?.serialize().toString('base64'),
+          memberPubkey: values.pubkey,
+          shareCount: values.shares,
+          walletPubKey: hydraWallet.pubkey,
+          cluster,
+        }),
+      })
+
+      if (res.status === 200) {
+        setFormState('success')
+        // Revalidate wallet details cache
+        setTimeout(function () {
+          mutate(`/api/wallets/${hydraWallet.pubkey}?cluster=${cluster}`)
+        }, 1000)
+      } else {
+        mutate(`/api/wallets/${hydraWallet.pubkey}?cluster=${cluster}`)
+        const json = await res.json()
+        setFormState('error')
+        setErrorMsg(json.msg)
+        setLogs(json.logs)
+      }
+    } catch (error: any) {
+      setFormState('error')
+      setErrorMsg(`Failed to add member: ${error.message}`)
+    }
+    resetForm()
   }
 
   const validate = (values: any) => {
     let errors: FormikErrors<FormValues> = {}
 
-    if (!values.pubKey) {
-      errors.pubKey = 'This field is required'
+    if (!values.pubkey) {
+      errors.pubkey = 'This field is required'
+    }
+
+    if (!values.shares) {
+      errors.shares = 'Enter a valid number of shares'
     }
 
     return errors
+  }
+
+  const checkNumeric = (event: any) => {
+    if (event.key == '.') {
+      event.preventDefault()
+    }
   }
 
   const formik = useFormik({
@@ -43,9 +132,9 @@ const AddMemberModal = () => {
           className="modal-toggle"
           ref={toggleRef}
         />
-        <div className="modal modal-bottom sm:modal-middle">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg pb-5">
+        <label htmlFor='add-member-modal' className="modal modal-bottom sm:modal-middle">
+          <label htmlFor='' className="modal-box">
+            <h3 className="font-bold text-lg pb-2">
               Add a member to your Wallet
             </h3>
             <label className="label">Public key:</label>
@@ -53,26 +142,57 @@ const AddMemberModal = () => {
               type="text"
               placeholder="Enter the member's public key"
               className="input input-bordered w-full"
-              {...formik.getFieldProps('pubKey')}
+              {...formik.getFieldProps('pubkey')}
             />
-            {formik.errors.pubKey && formik.touched.pubKey ? (
-              <div className="text-red-500">{formik.errors.pubKey}</div>
+            <label className="label">Shares:</label>
+            <input
+              type="number"
+              placeholder="Enter the member's shares"
+              className="input input-bordered w-full"
+              onKeyPress={(event) => checkNumeric(event)}
+              {...formik.getFieldProps('shares')}
+            />
+
+            {formik.errors.pubkey && formik.touched.pubkey ? (
+              <div className="text-red-500">{formik.errors.pubkey}</div>
             ) : null}
+
+            <div className="mt-4">
+              <FormStateAlert
+                state={formik.isSubmitting ? 'submitting' : formState}
+                submittingMsg="Adding Member to Hydra Wallet..."
+                successMsg="Successfully added member!"
+                errorMsg={errorMsg}
+                logs={logs}
+              />
+            </div>
 
             <div className="flex w-full justify-end gap-4">
               <div className="modal-action">
-                <button type="submit" className="btn btn-primary">
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={
+                    !(formik.dirty && formik.isValid) || formik.isSubmitting
+                  }
+                >
                   Add
                 </button>
               </div>
               <div className="modal-action">
-                <label htmlFor="add-member-modal" className="btn">
+                <label
+                  className="btn"
+                  htmlFor="add-member-modal"
+                  onClick={() => {
+                    setFormState('idle' as FormState)
+                  }}
+                >
                   Cancel
                 </label>
               </div>
             </div>
-          </div>
-        </div>
+          </label>
+        </label>
       </form>
     </div>
   )

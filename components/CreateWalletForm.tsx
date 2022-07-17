@@ -7,6 +7,7 @@ import { useAppSelector } from '../hooks/useAppSelector'
 import { selectCluster } from '../redux/features/wallet/walletSlice'
 import FormStateAlert, { FormState } from './FormStateAlert'
 import { useRouter } from 'next/router'
+import { isValidPubKey } from '../utils/utils'
 
 interface FormValues {
   name: string
@@ -38,6 +39,7 @@ const CreateWalletForm = () => {
 
   const [formState, setFormState] = useState('idle' as FormState)
   const [errorMsg, setErrorMsg] = useState('')
+  const [logs, setLogs] = useState([])
 
   const onSubmit = async (values: any) => {
     if (!wallet) {
@@ -47,8 +49,9 @@ const CreateWalletForm = () => {
     }
 
     try {
+      setLogs([])
       const fanoutSdk = new FanoutClient(connection, wallet)
-
+      console.log(values)
       // Calculate fanout public key
       const [fanoutPubkey] = await FanoutClient.fanoutKey(values.name)
 
@@ -76,7 +79,7 @@ const CreateWalletForm = () => {
       const txSigned = await wallet.signTransaction(tx)
 
       // Send API request
-      const res = await fetch('api/createHydraWallet', {
+      const res = await fetch('/api/createHydraWallet', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -88,7 +91,7 @@ const CreateWalletForm = () => {
           authority: wallet.publicKey.toBase58(),
           memberShipType: values.model,
           acceptSPL: values.acceptSPL,
-          splToken: values.pubKeySPL,
+          splToken: values.acceptSPL ? values.pubKeySPL : undefined,
           // TODO: Include mint public key for token membership model
           totalShares: values.shares,
           cluster,
@@ -104,6 +107,7 @@ const CreateWalletForm = () => {
         const json = await res.json()
         setFormState('error')
         setErrorMsg(json.msg)
+        setLogs(json.logs)
       }
     } catch (error: any) {
       setFormState('error')
@@ -122,15 +126,18 @@ const CreateWalletForm = () => {
       errors.shares = 'Enter a valid number of shares'
     }
 
-    if (values.acceptSPL && !values.pubKeySPL) {
-      errors.pubKeySPL = 'This field is required'
-    }
+    if (values.acceptSPL)
+      values.pubKeySPL
+        ? isValidPubKey(values.pubKeySPL)
+          ? (errors.pubKeySPL = 'Please enter a valid public key')
+          : null
+        : (errors.pubKeySPL = 'This field is required')
 
     return errors
   }
 
   const checkNumeric = (event: any) => {
-    if (event.key == '.') {
+    if (event.key == '.' || event.key == '-') {
       event.preventDefault()
     }
   }
@@ -151,6 +158,7 @@ const CreateWalletForm = () => {
         submittingMsg="Creating Hydra Wallet..."
         successMsg="Successfully created Hydra Wallet!"
         errorMsg={errorMsg}
+        logs={logs}
       />
       <div className="w-full md:w-1/2 flex flex-col items-center md:items-start gap-10">
         <div className="form-control w-4/5">
@@ -181,6 +189,7 @@ const CreateWalletForm = () => {
           </label>
           <input
             type="number"
+            min="1"
             id="shares"
             placeholder="Enter a number of shares"
             className="input input-bordered w-full"

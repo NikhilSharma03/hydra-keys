@@ -2,7 +2,7 @@ import HomeBannerSvg from '../assets/svg/homeBanner'
 import ArrowSvg from '../assets/svg/arrow'
 import styles from './../styles/Home.module.css'
 
-const HeroSection = () => {
+const HeroSection = ({ onHandleGetStarted }) => {
   return (
     <main className="overflow-hidden py-5 ">
       <div className="flex w-full h-screen max-h-[85vh] relative">
@@ -19,7 +19,10 @@ const HeroSection = () => {
             <button className="btn w-8/12 sm:w-fit btn-secondary px-6 text-lg font-normal">
               Keep Exploring <ArrowSvg width="17px" height="17px" fill="#fff" />
             </button>
-            <button className="btn w-8/12	sm:w-fit btn-primary px-6 text-lg font-normal">
+            <button
+              onClick={onHandleGetStarted}
+              className="btn w-8/12	sm:w-fit btn-primary px-6 text-lg font-normal"
+            >
               Get Started{' '}
               <ArrowSvg
                 width="17px"

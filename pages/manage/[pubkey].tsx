@@ -1,71 +1,46 @@
-import { useWallet } from '@solana/wallet-adapter-react'
 import type { NextPage } from 'next'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import WalletDetails from '../../components/WalletDetails'
+import LoadingSpinner from '../../components/LoadingSpinner'
+import { useAppSelector } from '../../hooks/useAppSelector'
+import { selectCluster } from '../../redux/features/wallet/walletSlice'
+import useSWR from 'swr'
+import { useProtectRoute } from '../../hooks/useProtectRoute'
+import { useRouter } from 'next/router'
 
-export const getServerSideProps = async (context: any) => {
-  const pubKey = context.params.pubkey
-
-  // get the Wallet details here
-  const wallet = {
-    pubKey: pubKey,
-    name: 'MY WALLEEEEET',
-    members: [
-      {
-        address: 'D4QYC..ioi',
-        addedOn: 'April 15, 2022',
-        shares: 23,
-      },
-      {
-        address: 'D4QYC..ioi',
-        addedOn: 'April 15, 2022',
-        shares: 23,
-      },
-      {
-        address: 'D4QYC..ioi',
-        addedOn: 'April 15, 2022',
-        shares: 23,
-      },
-      {
-        address: 'D4QYC...ioi',
-        addedOn: 'April 15, 2022',
-        shares: 23,
-      },
-      {
-        address: 'D4QYC...ioi',
-        addedOn: 'April 15, 2022',
-        shares: 23,
-      },
-    ],
-    authority: 'D4QYC...ioi',
-    shares: 100,
-    model: 'Wallet membership',
-    acceptSPL: true,
-    pubKeySPL: '2msQ3eha1rvhSuwCPJ213oVgwtu3FSgxBXS6RPrzsDWB',
-  }
-  return {
-    props: { wallet: wallet },
-  }
+const fetcher = (key: string) => {
+  if (key) {
+    return fetch(key).then((res) => res.json())
+ }
 }
 
-interface Props {
-  wallet: any
-}
-
-const WalletDetailsPage: NextPage<Props> = ({ wallet }) => {
-  const { connected } = useWallet()
+const WalletDetailsPage: NextPage = () => {
   const router = useRouter()
+  const pubKey = router.query.pubkey
+  const cluster = useAppSelector(selectCluster)
 
-  useEffect(() => {
-    if (router.isReady && !connected) {
-      router.replace('/')
-    }
-  }, [router, connected])
+  useProtectRoute()
+
+  const endpoint = pubKey ? `/api/wallets/${pubKey}?cluster=${cluster}` : ''
+  const { data, error } = useSWR(endpoint, fetcher)
+
+  if (error) {
+    return <p className="text-center">Failed to load wallet</p>
+  }
+
+  if (!data) {
+    return (
+      <div className="flex flex-row justify-center items-center">
+        <LoadingSpinner />
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto px-6 sm:px-0 gap-10 flex flex-col justify-center items-center my-10">
-      <WalletDetails wallet={wallet} />
+      <WalletDetails
+        initialWallet={data.found ? data.wallet : {}}
+        members={data.found ? data.members : []}
+      />
     </div>
   )
 }

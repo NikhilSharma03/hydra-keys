@@ -16,7 +16,7 @@ model Wallet {
   authority      String
   memberShipType String
   acceptSPL      Boolean
-  splToken       String
+  splToken       String?
   membership     Membership[]
   totalShares    Int
   cluster        String

@@ -1,7 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { PrismaClient } from '@prisma/client'
-import { clusterApiUrl, Connection } from '@solana/web3.js'
+import { clusterApiUrl, Connection, SendTransactionError } from '@solana/web3.js'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 
 const prisma = new PrismaClient()
 
@@ -60,11 +61,11 @@ export default async function handler(
         signature,
       })
 
-      // Transaction failed?
+      // Transaction confirmation failed?
       if (result.value.err) {
         throw {
           response: {
-            msg: `Transaction failed: ${result.value.err.toString()}`,
+            msg: `Transaction confirmation failed: ${result.value.err.toString()}`,
           },
         }
       }
@@ -72,6 +73,8 @@ export default async function handler(
       sentTransaction = true
       res.status(200).json({ data: savedWallet })
     } catch (error: any) {
+      console.error(error)
+
       if (insertedIntoDb && !sentTransaction) {
         await prisma.wallet.delete({
           where: {
@@ -83,10 +86,25 @@ export default async function handler(
         })
       }
 
-      console.error(error)
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          res
+            .status(400)
+            .json({ msg: 'A wallet with the same data already exists' })
+          return
+        }
+      } else if (error instanceof SendTransactionError) {
+        res
+          .status(500)
+          .json({
+            msg: error.message,
+            logs: error.logs
+          })
+        return
+      }
 
       res
-        .status(400)
+        .status(500)
         .json(
           error.response
             ? error.response

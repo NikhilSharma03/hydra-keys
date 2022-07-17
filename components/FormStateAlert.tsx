@@ -5,6 +5,7 @@ type FormStateAlertProps = {
   submittingMsg: string
   successMsg: string
   errorMsg: string
+  logs?: string[]
 }
 
 const FormStateAlert = ({
@@ -12,6 +13,7 @@ const FormStateAlert = ({
   submittingMsg,
   successMsg,
   errorMsg,
+  logs,
 }: FormStateAlertProps) => {
   const alertClass: Record<FormState, string> = {
     idle: '',
@@ -39,8 +41,19 @@ const FormStateAlert = ({
     return <div></div>
   }
 
+  const LogsCollapse = () =>
+    logs?.length ? (
+      <div tabIndex={0} className="collapse collapse-arrow">
+        <input type="checkbox" />
+        <div className="collapse-title font-bold">Logs</div>
+        <ul className="collapse-content">
+          {logs.map((log, idx) => <li key={idx}>{log}</li>)}
+        </ul>
+      </div>
+    ) : null
+
   return (
-    <div className={`alert ${alertClass[state]} shadow-lg`}>
+    <div className={`alert ${alertClass[state]} shadow-lg flex-col items-start gap-0`}>
       <div>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -57,6 +70,7 @@ const FormStateAlert = ({
         </svg>
         <span>{alertMsg[state]}</span>
       </div>
+      <LogsCollapse />
     </div>
   )
 }
