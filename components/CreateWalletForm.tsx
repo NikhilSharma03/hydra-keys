@@ -200,6 +200,25 @@ const CreateWalletForm = () => {
             <div className="text-red-500">{formik.errors.shares}</div>
           ) : null}
         </div>
+
+
+        {formik.values.model == 'Token membership' ?
+          <div className="form-control w-4/5">
+            <label className="label">
+              <span>Mint Public Key</span>
+            </label>
+            <input
+              type="text"
+              id="mintPubKey"
+              placeholder="Enter the mint public key"
+              className="input input-bordered w-full"
+            />
+
+          </div>
+
+        
+        : null}
+
       </div>
 
       <div className="w-full md:w-1/2 flex flex-col items-center md:items-end gap-10">
@@ -245,8 +264,8 @@ const CreateWalletForm = () => {
             {...formik.getFieldProps('pubKeySPL')}
           />
           {formik.errors.pubKeySPL &&
-          formik.touched.pubKeySPL &&
-          formik.values.acceptSPL ? (
+            formik.touched.pubKeySPL &&
+            formik.values.acceptSPL ? (
             <div className="text-red-500">{formik.errors.pubKeySPL}</div>
           ) : null}
         </div>
@@ -264,5 +283,4 @@ const CreateWalletForm = () => {
     </form>
   )
 }
-
 export default CreateWalletForm
