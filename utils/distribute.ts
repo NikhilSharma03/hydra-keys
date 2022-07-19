@@ -1,4 +1,6 @@
 import { FanoutClient } from '@glasseaters/hydra-sdk'
+// @ts-ignore
+import { getAccount } from '@solana/spl-token'
 import { PublicKey, Transaction } from '@solana/web3.js'
 
 type DistributeMemberArgs = {
@@ -48,8 +50,49 @@ const distributeWalletMemberTransaction = async (
   return tx
 }
 
+const distributeNftMemberTransaction = async (args: DistributeMemberArgs) => {
+  const { fanoutSdk, hydra, payer, member: nftMint } = args
+  const connection = fanoutSdk.provider.connection
+
+  const mintPubkey = new PublicKey(nftMint)
+
+  const tokenAccountAddress = (
+    await connection.getTokenLargestAccounts(mintPubkey)
+  ).value[0].address
+
+  const member = (await getAccount(connection, tokenAccountAddress)).owner
+
+  const tx = new Transaction()
+
+  const ixDistSOL = await fanoutSdk.distributeNftMemberInstructions({
+    distributeForMint: false,
+    fanout: new PublicKey(hydra.pubkey),
+    payer,
+    membershipKey: mintPubkey,
+    member,
+  })
+
+  tx.add(...ixDistSOL.instructions)
+
+  if (hydra.acceptSPL) {
+    const ixDistSPL = await fanoutSdk.distributeWalletMemberInstructions({
+      distributeForMint: true,
+      fanout: new PublicKey(hydra.pubkey),
+      payer,
+      membershipKey: mintPubkey,
+      member,
+      fanoutMint: new PublicKey(hydra.splToken),
+    })
+
+    tx.add(...ixDistSPL.instructions)
+  }
+
+  return tx
+}
+
 const distributeMemberTransactionTable = {
   ['Wallet membership']: distributeWalletMemberTransaction,
+  ['NFT membership']: distributeNftMemberTransaction,
 }
 
 export const distributeMemberTransaction = async (
