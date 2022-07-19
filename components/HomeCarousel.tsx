@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import styles from '../styles/HomeCarousel.module.css'
 import css from '../styles/styleTest.js';
 
