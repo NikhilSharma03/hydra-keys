@@ -15,6 +15,7 @@ interface FormValues {
   model: string
   acceptSPL: boolean
   pubKeySPL: string
+  mintPubKey: string
 }
 
 const membershipModel: Record<string, MembershipModel> = {
@@ -30,6 +31,7 @@ const CreateWalletForm = () => {
     model: 'Wallet membership',
     acceptSPL: false,
     pubKeySPL: '',
+    mintPubKey: ''
   }
 
   const router = useRouter()
@@ -92,7 +94,7 @@ const CreateWalletForm = () => {
           memberShipType: values.model,
           acceptSPL: values.acceptSPL,
           splToken: values.acceptSPL ? values.pubKeySPL : undefined,
-          // TODO: Include mint public key for token membership model
+          mintPubKey: formik.values.model == 'Token membership' ? values.mintPubKey : undefined,
           totalShares: values.shares,
           cluster,
         }),
@@ -120,6 +122,7 @@ const CreateWalletForm = () => {
 
     if (!values.name) {
       errors.name = 'This field is required'
+      console.log("Name ERRORS");
     }
 
     if (!values.shares) {
@@ -132,6 +135,10 @@ const CreateWalletForm = () => {
           ? (errors.pubKeySPL = 'Please enter a valid public key')
           : null
         : (errors.pubKeySPL = 'This field is required')
+
+    if (formik.values.model == 'Token membership') {
+      !values.mintPubKey? ()=>{errors.mintPubKey = 'This field is required';console.log("Mint ERROR")  }: null;
+    }
 
     return errors
   }
@@ -212,12 +219,13 @@ const CreateWalletForm = () => {
               id="mintPubKey"
               placeholder="Enter the mint public key"
               className="input input-bordered w-full"
+              {...formik.getFieldProps('mintPubKey')}
             />
-
+            {formik.errors.mintPubKey && formik.touched.mintPubKey ? (
+              <div className="text-red-500">{formik.errors.mintPubKey}</div>
+            ) : null}
           </div>
-
-        
-        : null}
+          : null}
 
       </div>
 
@@ -271,7 +279,7 @@ const CreateWalletForm = () => {
         </div>
       </div>
 
-      <div className="w-full flex justify-center md:justify-end">
+      <div className="w-full flex justify-center md:justify-center">
         <button
           type="submit"
           className="btn btn-secondary disabled:opacity-30 disabled:bg-secondary disabled:text-white"
