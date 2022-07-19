@@ -6,6 +6,7 @@ CREATE TABLE "Wallet" (
     "memberShipType" TEXT NOT NULL,
     "acceptSPL" BOOLEAN NOT NULL,
     "splToken" TEXT NOT NULL,
+    "minPubKey" TEXT NOT NULL,
     "totalShares" INTEGER NOT NULL,
     "cluster" TEXT NOT NULL,
     "validated" BOOLEAN NOT NULL DEFAULT false,

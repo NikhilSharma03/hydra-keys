@@ -17,6 +17,7 @@ model Wallet {
   memberShipType String
   acceptSPL      Boolean
   splToken       String?
+  minPubKey      String?
   membership     Membership[]
   totalShares    Int
   cluster        String
