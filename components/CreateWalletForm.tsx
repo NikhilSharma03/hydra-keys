@@ -137,7 +137,7 @@ const CreateWalletForm = () => {
         : (errors.pubKeySPL = 'This field is required')
 
     if (formik.values.model == 'Token membership') {
-      !values.mintPubKey? ()=>{errors.mintPubKey = 'This field is required';console.log("Mint ERROR")  }: null;
+      !values.mintPubKey? errors.mintPubKey = 'This field is required' : null;
     }
 
     return errors
