@@ -16,7 +16,7 @@ import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
 import { useCallback, useEffect, useState } from 'react'
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
 import { LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js'
-import { NATIVE_MINT } from '@solana/spl-token'
+import { NATIVE_MINT, TOKEN_PROGRAM_ID, AccountLayout} from '@solana/spl-token'
 import FormStateAlert, { FormState } from './FormStateAlert'
 import {
   distributeAllTransaction,
@@ -44,6 +44,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const { connection } = useConnection()
   const anchorwallet = useAnchorWallet()
   const [balance, setBalance] = useState(0)
+  const [splbalance, setsplbalance] = useState(0)
 
   //toggle refresh page on fund distribution
   const updateRefresh = (newRefresh: { msg: string }) => {
@@ -109,23 +110,19 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     setWallet(newWallet)
   }
 
-  //Derive Balance, totalavailableshares, totalinflow from blockchain
+  //Derive spl-token balance
   useEffect(() => {
     ;(async () => {
-      const fanout = await Fanout.fromAccountAddress(
-        connection,
-        new PublicKey(wallet.pubkey)
-      )
-      const nativeAccountPubkey = fanout.accountKey
-      const nativeAccountInfo = await connection.getAccountInfo(
-        nativeAccountPubkey
-      )
-
-      const Rentbalance = await connection.getMinimumBalanceForRentExemption(1)
-
-      setBalance(
-        ((nativeAccountInfo?.lamports ?? 0) - Rentbalance) / LAMPORTS_PER_SOL
-      )
+      const tokenAccounts = await connection.getTokenAccountsByOwner(
+        new PublicKey(wallet.pubkey),
+        {
+          programId: TOKEN_PROGRAM_ID,
+        }
+      );
+    tokenAccounts.value.forEach((e) => {
+    const accountInfo = AccountLayout.decode(e.account.data);
+    setsplbalance(accountInfo.amount)
+  })
     })()
   }, [connection, wallet.pubkey])
 
@@ -412,6 +409,13 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
             <div className="flex flex-col lg:flex-row justify-between w-full md:w-1/2">
               <p className="mr-3">SPL public key: </p>
               <p className="text-primary break-words"> {wallet.splToken}</p>
+            </div>
+          ) : null}
+          
+          {wallet.acceptSPL ? (
+            <div className="flex flex-col lg:flex-row justify-between w-full md:w-1/2">
+              <p className="mr-3">SPL Token balance: </p>
+              <p className="text-primary break-words"> {splbalance} </p>
             </div>
           ) : null}
         </div>
