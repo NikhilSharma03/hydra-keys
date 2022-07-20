@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Membership, PrismaClient } from '@prisma/client';
+import { clusters, Membership, PrismaClient, memberShipTypes } from '@prisma/client';
 import { MembershipModel } from '@glasseaters/hydra-sdk';
 
 const prisma=new PrismaClient();
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
           memberPubkey:body.memberPubkey,
           shareCount:body.shareCount,
           walletPubkey:body.walletPubkey,
-          cluster:body.cluster,
+          cluster:<keyof typeof clusters> body.cluster,
           wallet:body.wallet
 
         }

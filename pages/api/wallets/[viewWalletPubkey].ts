@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { clusters, Membership, PrismaClient } from '@prisma/client';
+import { clusters, Membership, PrismaClient, memberShipTypes } from '@prisma/client';
 import { MembershipModel } from '@glasseaters/hydra-sdk';
 
 const prisma=new PrismaClient();

@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgresser:thisisademo@localhost:5432/devdb"
+  url      = env("DATABASE_URL")
 }
 
 model Wallet {
