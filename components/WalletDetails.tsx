@@ -16,7 +16,8 @@ import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
 import { useCallback, useEffect, useState } from 'react'
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
 import { LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js'
-import { NATIVE_MINT, TOKEN_PROGRAM_ID, AccountLayout} from '@solana/spl-token'
+//@ts-ignore
+import { NATIVE_MINT, getAccount, getAssociatedTokenAddress} from '@solana/spl-token'
 import FormStateAlert, { FormState } from './FormStateAlert'
 import {
   distributeAllTransaction,
@@ -113,18 +114,18 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   //Derive spl-token balance
   useEffect(() => {
     ;(async () => {
-      const tokenAccounts = await connection.getTokenAccountsByOwner(
+      const tokenAccountaddress = await getAssociatedTokenAddress(
+        new PublicKey(wallet.splToken),
         new PublicKey(wallet.pubkey),
-        {
-          programId: TOKEN_PROGRAM_ID,
-        }
-      );
-    tokenAccounts.value.forEach((e) => {
-    const accountInfo = AccountLayout.decode(e.account.data);
-    setsplbalance(accountInfo.amount)
-  })
+        true
+      )
+      const AccountInformation = await getAccount(
+        connection,
+        tokenAccountaddress
+      )
+      setsplbalance(AccountInformation.amount)
     })()
-  }, [connection, wallet.pubkey])
+  }, [connection, wallet.pubkey, wallet.splToken])
 
   const handleDistribute = async (memberPubkey: string) => {
     if (!anchorwallet) {
