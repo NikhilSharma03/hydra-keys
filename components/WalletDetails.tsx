@@ -114,6 +114,10 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
 
   //Derive spl-token balance
   useEffect(() => {
+    if (!wallet.acceptSPL) {
+      return
+    }
+
     ;(async () => {
       const tokenAccountaddress = await getAssociatedTokenAddress(
         new PublicKey(wallet.splToken),
