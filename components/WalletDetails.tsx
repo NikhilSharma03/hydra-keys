@@ -114,6 +114,10 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   }
 
   const fetchTokenBalance = useCallback(async () => {
+    if (!wallet.splToken) {
+      return
+    }
+
     const tokenAccountaddress = await getAssociatedTokenAddress(
       new PublicKey(wallet.splToken),
       new PublicKey(wallet.pubkey),
@@ -128,12 +132,8 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
 
   //Derive spl-token balance
   useEffect(() => {
-    if (!wallet.acceptSPL) {
-      return
-    }
-
     fetchTokenBalance()
-  }, [wallet.acceptSPL, fetchTokenBalance])
+  }, [fetchTokenBalance])
 
   const handleDistribute = async (memberPubkey: string) => {
     if (!anchorwallet) {
