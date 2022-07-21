@@ -86,7 +86,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       setFormState2('error')
       setErrorMsg(`Failed to refresh: ${error.message}`)
     }
-  }, [])
+  }, [anchorwallet, connection, wallet.name])
 
   //useEffect for refreshing page
   useEffect(() => {
