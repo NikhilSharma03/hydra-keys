@@ -75,6 +75,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       setBalance(
         ((nativeAccountInfo?.lamports ?? 0) - Rentbalance) / LAMPORTS_PER_SOL
       )
+      fetchTokenBalance()
       setAvailableShares(fanoutObject.totalAvailableShares.toString())
       setTimeout(function () {
         setFormState2('idle')
@@ -112,25 +113,27 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     setWallet(newWallet)
   }
 
+  const fetchTokenBalance = useCallback(async () => {
+    const tokenAccountaddress = await getAssociatedTokenAddress(
+      new PublicKey(wallet.splToken),
+      new PublicKey(wallet.pubkey),
+      true
+    )
+    const tokenAccountBalance = await connection.getTokenAccountBalance(
+      tokenAccountaddress)
+    const rawBalance = tokenAccountBalance.value.amount
+    const decimals = tokenAccountBalance.value.decimals
+    setsplbalance(rawAmountToRealString(rawBalance, decimals))
+  }, [connection, wallet.pubkey, wallet.splToken])
+
   //Derive spl-token balance
   useEffect(() => {
     if (!wallet.acceptSPL) {
       return
     }
 
-    ;(async () => {
-      const tokenAccountaddress = await getAssociatedTokenAddress(
-        new PublicKey(wallet.splToken),
-        new PublicKey(wallet.pubkey),
-        true
-      )
-      const tokenAccountBalance = await connection.getTokenAccountBalance(
-        tokenAccountaddress)
-      const rawBalance = tokenAccountBalance.value.amount
-      const decimals = tokenAccountBalance.value.decimals
-      setsplbalance(rawAmountToRealString(rawBalance, decimals))
-    })()
-  }, [connection, wallet.pubkey, wallet.splToken])
+    fetchTokenBalance()
+  }, [wallet.acceptSPL, fetchTokenBalance])
 
   const handleDistribute = async (memberPubkey: string) => {
     if (!anchorwallet) {
