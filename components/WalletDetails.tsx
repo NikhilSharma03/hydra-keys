@@ -15,14 +15,15 @@ import Link from 'next/link'
 import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
 import { useCallback, useEffect, useState } from 'react'
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
-import { LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js'
+import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
 //@ts-ignore
-import { NATIVE_MINT, getAccount, getAssociatedTokenAddress} from '@solana/spl-token'
+import { getAssociatedTokenAddress} from '@solana/spl-token'
 import FormStateAlert, { FormState } from './FormStateAlert'
 import {
   distributeAllTransaction,
   distributeMemberTransaction,
 } from '../utils/distribute'
+import { rawAmountToRealString } from '../utils/utils'
 
 type WalletDetailsProps = {
   initialWallet: any
@@ -45,7 +46,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const { connection } = useConnection()
   const anchorwallet = useAnchorWallet()
   const [balance, setBalance] = useState(0)
-  const [splbalance, setsplbalance] = useState(0)
+  const [splbalance, setsplbalance] = useState('0')
 
   //toggle refresh page on fund distribution
   const updateRefresh = (newRefresh: { msg: string }) => {
@@ -119,11 +120,11 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         new PublicKey(wallet.pubkey),
         true
       )
-      const AccountInformation = await getAccount(
-        connection,
-        tokenAccountaddress
-      )
-      setsplbalance(AccountInformation.amount)
+      const tokenAccountBalance = await connection.getTokenAccountBalance(
+        tokenAccountaddress)
+      const rawBalance = tokenAccountBalance.value.amount
+      const decimals = tokenAccountBalance.value.decimals
+      setsplbalance(rawAmountToRealString(rawBalance, decimals))
     })()
   }, [connection, wallet.pubkey, wallet.splToken])
 
