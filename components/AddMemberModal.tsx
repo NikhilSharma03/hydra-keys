@@ -28,7 +28,7 @@ const AddMemberModal = ({
 
   const initialValues = {
     pubkey: '',
-    shares: '',
+    shares: '0',
   }
 
   const { connection } = useConnection()
@@ -105,7 +105,6 @@ const AddMemberModal = ({
         setFormState('idle')
       }, 2000)
     }
-
   }
 
   const validate = (values: any) => {
@@ -165,7 +164,7 @@ const AddMemberModal = ({
             {formik.errors.pubkey && formik.touched.pubkey ? (
               <div className="mt-2 text-red-500">{formik.errors.pubkey}</div>
             ) : null}
-            
+
             <label className="label">Shares:</label>
             <input
               type="number"
@@ -175,7 +174,7 @@ const AddMemberModal = ({
               {...formik.getFieldProps('shares')}
             />
 
-            {formik.errors.shares && formik.touched.shares ? (
+            {formik.errors.shares ? (
               <div className="mt-2 text-red-500">{formik.errors.shares}</div>
             ) : null}
 
