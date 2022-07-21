@@ -97,11 +97,15 @@ const AddMemberModal = ({
           setFormState('idle')
         }, 5000)
       }
+      resetForm()
     } catch (error: any) {
       setFormState('error')
       setErrorMsg(`Failed to add member: ${error.message}`)
+      setTimeout(function () {
+        setFormState('idle')
+      }, 2000)
     }
-    resetForm()
+
   }
 
   const validate = (values: any) => {
