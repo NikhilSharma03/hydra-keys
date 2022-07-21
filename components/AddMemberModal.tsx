@@ -11,6 +11,7 @@ import { useSWRConfig } from 'swr'
 
 type AddMemberModalProps = {
   hydraWallet: any
+  availableShares: number
 }
 
 interface FormValues {
@@ -18,13 +19,16 @@ interface FormValues {
   shares: number
 }
 
-const AddMemberModal = ({ hydraWallet }: AddMemberModalProps) => {
+const AddMemberModal = ({
+  hydraWallet,
+  availableShares,
+}: AddMemberModalProps) => {
   let toggleRef = useRef<HTMLInputElement>(null)
   const { mutate } = useSWRConfig()
 
   const initialValues = {
     pubkey: '',
-    shares: '',
+    shares: '0',
   }
 
   const { connection } = useConnection()
@@ -89,12 +93,18 @@ const AddMemberModal = ({ hydraWallet }: AddMemberModalProps) => {
         setFormState('error')
         setErrorMsg(json.msg)
         setLogs(json.logs)
+        setTimeout(function () {
+          setFormState('idle')
+        }, 5000)
       }
+      resetForm()
     } catch (error: any) {
       setFormState('error')
       setErrorMsg(`Failed to add member: ${error.message}`)
+      setTimeout(function () {
+        setFormState('idle')
+      }, 2000)
     }
-    resetForm()
   }
 
   const validate = (values: any) => {
@@ -108,11 +118,15 @@ const AddMemberModal = ({ hydraWallet }: AddMemberModalProps) => {
       errors.shares = 'Enter a valid number of shares'
     }
 
+    if (values.shares > availableShares) {
+      errors.shares = `You only have ${availableShares} available shares`
+    }
+
     return errors
   }
 
   const checkNumeric = (event: any) => {
-    if (event.key == '.') {
+    if (event.key == '.' || event.key == '-') {
       event.preventDefault()
     }
   }
@@ -132,8 +146,11 @@ const AddMemberModal = ({ hydraWallet }: AddMemberModalProps) => {
           className="modal-toggle"
           ref={toggleRef}
         />
-        <label htmlFor='add-member-modal' className="modal modal-bottom sm:modal-middle">
-          <label htmlFor='' className="modal-box">
+        <label
+          htmlFor="add-member-modal"
+          className="modal modal-bottom sm:modal-middle"
+        >
+          <label htmlFor="" className="modal-box">
             <h3 className="font-bold text-lg pb-2">
               Add a member to your Wallet
             </h3>
@@ -144,6 +161,10 @@ const AddMemberModal = ({ hydraWallet }: AddMemberModalProps) => {
               className="input input-bordered w-full"
               {...formik.getFieldProps('pubkey')}
             />
+            {formik.errors.pubkey && formik.touched.pubkey ? (
+              <div className="mt-2 text-red-500">{formik.errors.pubkey}</div>
+            ) : null}
+
             <label className="label">Shares:</label>
             <input
               type="number"
@@ -153,8 +174,8 @@ const AddMemberModal = ({ hydraWallet }: AddMemberModalProps) => {
               {...formik.getFieldProps('shares')}
             />
 
-            {formik.errors.pubkey && formik.touched.pubkey ? (
-              <div className="text-red-500">{formik.errors.pubkey}</div>
+            {formik.errors.shares ? (
+              <div className="mt-2 text-red-500">{formik.errors.shares}</div>
             ) : null}
 
             <div className="mt-4">

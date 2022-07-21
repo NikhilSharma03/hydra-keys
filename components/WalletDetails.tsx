@@ -53,6 +53,24 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     setRefresh(newRefresh)
   }
 
+
+  const fetchTokenBalance = useCallback(async () => {
+    if (!wallet.splToken) {
+      return
+    }
+
+    const tokenAccountaddress = await getAssociatedTokenAddress(
+      new PublicKey(wallet.splToken),
+      new PublicKey(wallet.pubkey),
+      true
+    )
+    const tokenAccountBalance = await connection.getTokenAccountBalance(
+      tokenAccountaddress)
+    const rawBalance = tokenAccountBalance.value.amount
+    const decimals = tokenAccountBalance.value.decimals
+    setsplbalance(rawAmountToRealString(rawBalance, decimals))
+  }, [connection, wallet.pubkey, wallet.splToken])
+  
   //refresh function
   const fetchData = useCallback(async () => {
     setFormState2('submitting')
@@ -86,7 +104,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       setFormState2('error')
       setErrorMsg(`Failed to refresh: ${error.message}`)
     }
-  }, [])
+  }, [anchorwallet, connection, fetchTokenBalance, wallet.name])
 
   //useEffect for refreshing page
   useEffect(() => {
@@ -113,22 +131,6 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     setWallet(newWallet)
   }
 
-  const fetchTokenBalance = useCallback(async () => {
-    if (!wallet.splToken) {
-      return
-    }
-
-    const tokenAccountaddress = await getAssociatedTokenAddress(
-      new PublicKey(wallet.splToken),
-      new PublicKey(wallet.pubkey),
-      true
-    )
-    const tokenAccountBalance = await connection.getTokenAccountBalance(
-      tokenAccountaddress)
-    const rawBalance = tokenAccountBalance.value.amount
-    const decimals = tokenAccountBalance.value.decimals
-    setsplbalance(rawAmountToRealString(rawBalance, decimals))
-  }, [connection, wallet.pubkey, wallet.splToken])
 
   //Derive spl-token balance
   useEffect(() => {
@@ -438,7 +440,9 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         </div>
       </div>
 
-      <AddMemberModal hydraWallet={wallet} />
+      <AddMemberModal hydraWallet={wallet}
+        availableShares ={availableShares}
+      />
       <FundWalletModal
         modalId="fund-wallet-modal"
         hydraWallet={wallet}
