@@ -87,6 +87,7 @@ export default async function handler(
       }
 
       if (error instanceof PrismaClientKnownRequestError) {
+
         if (error.code === 'P2002') {
           res
             .status(400)
@@ -94,13 +95,20 @@ export default async function handler(
           return
         }
       } else if (error instanceof SendTransactionError) {
-        res
-          .status(500)
-          .json({
-            msg: error.message,
-            logs: error.logs
-          })
-        return
+        if(error.logs?.[3].includes('already in use'))
+        {
+          res.status(400).json({msg: 'A wallet with the same data already exists'})
+          return
+        }
+        else{
+            res
+            .status(500)
+            .json({
+              msg: error.message,
+              logs: error.logs
+            })
+            return
+          }
       }
 
       res
