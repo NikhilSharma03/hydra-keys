@@ -75,7 +75,7 @@ const distributeNftMemberTransaction = async (args: DistributeMemberArgs) => {
   tx.add(...ixDistSOL.instructions)
 
   if (hydra.acceptSPL) {
-    const ixDistSPL = await fanoutSdk.distributeWalletMemberInstructions({
+    const ixDistSPL = await fanoutSdk.distributeNftMemberInstructions({
       distributeForMint: true,
       fanout: new PublicKey(hydra.pubkey),
       payer,
