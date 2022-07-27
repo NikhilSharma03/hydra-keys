@@ -17,7 +17,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
 import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
 //@ts-ignore
-import { getAssociatedTokenAddress} from '@solana/spl-token'
+import { getAssociatedTokenAddress } from '@solana/spl-token'
 import FormStateAlert, { FormState } from './FormStateAlert'
 import {
   distributeAllTransaction,
@@ -53,7 +53,6 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     setRefresh(newRefresh)
   }
 
-
   const fetchTokenBalance = useCallback(async () => {
     if (!wallet.splToken) {
       return
@@ -65,12 +64,13 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       true
     )
     const tokenAccountBalance = await connection.getTokenAccountBalance(
-      tokenAccountaddress)
+      tokenAccountaddress
+    )
     const rawBalance = tokenAccountBalance.value.amount
     const decimals = tokenAccountBalance.value.decimals
     setsplbalance(rawAmountToRealString(rawBalance, decimals))
   }, [connection, wallet.pubkey, wallet.splToken])
-  
+
   //refresh function
   const fetchData = useCallback(async () => {
     setFormState2('submitting')
@@ -130,7 +130,6 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     newWallet.splToken = pubKeySPL
     setWallet(newWallet)
   }
-
 
   //Derive spl-token balance
   useEffect(() => {
@@ -422,7 +421,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
               <p className="text-primary break-words"> {wallet.splToken}</p>
             </div>
           ) : null}
-          
+
           {wallet.acceptSPL ? (
             <div className="flex flex-col lg:flex-row justify-between w-full md:w-1/2">
               <p className="mr-3">SPL Token balance: </p>
@@ -440,9 +439,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         </div>
       </div>
 
-      <AddMemberModal hydraWallet={wallet}
-        availableShares ={availableShares}
-      />
+      <AddMemberModal hydraWallet={wallet} availableShares={availableShares} />
       <FundWalletModal
         modalId="fund-wallet-modal"
         hydraWallet={wallet}
