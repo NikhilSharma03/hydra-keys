@@ -27,6 +27,7 @@ export default async function handler(
       memberShipType,
       acceptSPL,
       splToken,
+      mintPubKey,
       totalShares,
       cluster,
     } = req.body
@@ -46,7 +47,7 @@ export default async function handler(
           memberShipType: memberShipType,
           acceptSPL: acceptSPL,
           splToken: splToken,
-          // TODO: Include mint public key for Token membership model
+          mintPubKey:memberShipType=="Token membership"?mintPubKey:null,
           totalShares: totalShares,
           cluster: cluster,
         },
