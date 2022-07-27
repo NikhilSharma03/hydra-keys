@@ -15,9 +15,15 @@ import Link from 'next/link'
 import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
 import { useCallback, useEffect, useState } from 'react'
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
-import { LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
-import { NATIVE_MINT } from '@solana/spl-token'
+import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
+//@ts-ignore
+import { getAssociatedTokenAddress} from '@solana/spl-token'
 import FormStateAlert, { FormState } from './FormStateAlert'
+import {
+  distributeAllTransaction,
+  distributeMemberTransaction,
+} from '../utils/distribute'
+import { rawAmountToRealString } from '../utils/utils'
 
 type WalletDetailsProps = {
   initialWallet: any
@@ -40,13 +46,31 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const { connection } = useConnection()
   const anchorwallet = useAnchorWallet()
   const [balance, setBalance] = useState(0)
+  const [splbalance, setsplbalance] = useState('0')
 
   //toggle refresh page on fund distribution
   const updateRefresh = (newRefresh: { msg: string }) => {
-  setRefresh(newRefresh)
+    setRefresh(newRefresh)
   }
 
 
+  const fetchTokenBalance = useCallback(async () => {
+    if (!wallet.splToken) {
+      return
+    }
+
+    const tokenAccountaddress = await getAssociatedTokenAddress(
+      new PublicKey(wallet.splToken),
+      new PublicKey(wallet.pubkey),
+      true
+    )
+    const tokenAccountBalance = await connection.getTokenAccountBalance(
+      tokenAccountaddress)
+    const rawBalance = tokenAccountBalance.value.amount
+    const decimals = tokenAccountBalance.value.decimals
+    setsplbalance(rawAmountToRealString(rawBalance, decimals))
+  }, [connection, wallet.pubkey, wallet.splToken])
+  
   //refresh function
   const fetchData = useCallback(async () => {
     setFormState2('submitting')
@@ -66,7 +90,10 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         nativeAccountPubkey
       )
       const Rentbalance = await connection.getMinimumBalanceForRentExemption(1)
-      setBalance(((nativeAccountInfo?.lamports ?? 0) - Rentbalance) / LAMPORTS_PER_SOL)
+      setBalance(
+        ((nativeAccountInfo?.lamports ?? 0) - Rentbalance) / LAMPORTS_PER_SOL
+      )
+      fetchTokenBalance()
       setAvailableShares(fanoutObject.totalAvailableShares.toString())
       setTimeout(function () {
         setFormState2('idle')
@@ -77,8 +104,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       setFormState2('error')
       setErrorMsg(`Failed to refresh: ${error.message}`)
     }
-  }, [])
-
+  }, [anchorwallet, connection, fetchTokenBalance, wallet.name])
 
   //useEffect for refreshing page
   useEffect(() => {
@@ -105,60 +131,38 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
     setWallet(newWallet)
   }
 
-  //Derive Balance, totalavailableshares, totalinflow from blockchain
+
+  //Derive spl-token balance
   useEffect(() => {
-    ;(async () => {
-      const fanout = await Fanout.fromAccountAddress(
-        connection,
-        new PublicKey(wallet.pubkey)
-      )
-      const nativeAccountPubkey = fanout.accountKey
-      const nativeAccountInfo = await connection.getAccountInfo(
-        nativeAccountPubkey
-      )
+    fetchTokenBalance()
+  }, [fetchTokenBalance])
 
-      const Rentbalance = await connection.getMinimumBalanceForRentExemption(1)
-
-      setBalance(
-        ((nativeAccountInfo?.lamports ?? 0) - Rentbalance) / LAMPORTS_PER_SOL
-      )
-    })()
-  }, [connection, wallet.pubkey])
-
-  const handleDistribute = async (memberPubkey) => {
-    setFormState('submitting')
+  const handleDistribute = async (memberPubkey: string) => {
     if (!anchorwallet) {
+      setFormState('error')
+      setErrorMsg('Please connect your wallet!')
       return
     }
 
     try {
+      setFormState('submitting')
       setLogs([])
+
       const fanoutSdk = new FanoutClient(connection, anchorwallet)
 
-      // Generate the distribution instructions
-      let distMember = await fanoutSdk.distributeWalletMemberInstructions({
-        distributeForMint: false,
-        fanout: new PublicKey(wallet.pubkey),
+      // Prepare transaction
+      const tx = await distributeMemberTransaction({
+        fanoutSdk,
+        hydra: wallet,
         payer: anchorwallet.publicKey,
         member: new PublicKey(memberPubkey),
+        membershipModel: wallet.memberShipType,
       })
 
-      console.log(distMember?.instructions)
-
-      const tx = new Transaction()
-      tx.add(...distMember.instructions)
-
-      // Generate SPL distribution instructions (if wallet accepts SPL tokens)
-      if (wallet.acceptSPL) {
-        let distMemberSPL = await fanoutSdk.distributeWalletMemberInstructions({
-          distributeForMint: true,
-          fanout: new PublicKey(wallet.pubkey),
-          payer: anchorwallet.publicKey,
-          member: new PublicKey(memberPubkey),
-          fanoutMint: new PublicKey(wallet.splToken)
-        })
-
-        tx.add(...distMemberSPL.instructions)
+      if (!tx) {
+        setFormState('error')
+        setErrorMsg('Unsupported membership model')
+        return
       }
 
       // Sign transaction using user's wallet
@@ -203,36 +207,49 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
 
       const fanoutSdk = new FanoutClient(connection, anchorwallet)
 
-      const ixDistAll = await fanoutSdk.distributeAllInstructions({
-        fanout: new PublicKey(wallet.pubkey),
+      // Prepare transaction
+      const tx = await distributeAllTransaction({
+        fanoutSdk,
+        hydra: wallet,
         payer: anchorwallet.publicKey,
-        mint: NATIVE_MINT,
+        members: members.map(
+          (member: any) => new PublicKey(member.memberPubkey)
+        ),
+        membershipModel: wallet.memberShipType,
       })
 
-      if (wallet.acceptSPL) {
-        const ixDistAllSPL = await fanoutSdk.distributeAllInstructions({
-          fanout: new PublicKey(wallet.pubkey),
-          payer: anchorwallet.publicKey,
-          mint: new PublicKey(wallet.splToken),
-        })
-
-        ixDistAll.instructions = ixDistAll.instructions.concat(
-          ixDistAllSPL.instructions
-        )
-
-        ixDistAll.signers = ixDistAll.signers.concat(
-          ixDistAllSPL.signers
-        )
+      if (!tx) {
+        setFormState('error')
+        setErrorMsg('Unsupported membership model')
+        return
       }
 
-      await fanoutSdk.executeBig(Promise.resolve(ixDistAll))
+      // Sign transaction using user's wallet
+      tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+      tx.feePayer = anchorwallet.publicKey
+      const txSigned = await anchorwallet.signTransaction(tx)
 
-      setFormState('success')
-      setTimeout(function () {
-        setFormState('idle')
-        fetchData()
-      }, 1000)
+      // Send transaction
+      const signature = await connection.sendRawTransaction(
+        txSigned.serialize()
+      )
+      const result = await connection.confirmTransaction({
+        signature,
+        ...(await connection.getLatestBlockhash()),
+      })
 
+      if (result.value.err) {
+        setFormState('error')
+        setErrorMsg(
+          `Failed to confirm transaction: ${result.value.err.toString()}`
+        )
+      } else {
+        setFormState('success')
+        setTimeout(function () {
+          setFormState('idle')
+          fetchData()
+        }, 1000)
+      }
     } catch (error: any) {
       console.error(error)
       setLogs(error.logs)
@@ -405,6 +422,13 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
               <p className="text-primary break-words"> {wallet.splToken}</p>
             </div>
           ) : null}
+          
+          {wallet.acceptSPL ? (
+            <div className="flex flex-col lg:flex-row justify-between w-full md:w-1/2">
+              <p className="mr-3">SPL Token balance: </p>
+              <p className="text-primary break-words"> {splbalance} </p>
+            </div>
+          ) : null}
         </div>
 
         <div className={`w-full ${showUpdateSPL ? 'block' : 'hidden'}`}>
@@ -416,7 +440,9 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         </div>
       </div>
 
-      <AddMemberModal hydraWallet={wallet} />
+      <AddMemberModal hydraWallet={wallet}
+        availableShares ={availableShares}
+      />
       <FundWalletModal
         modalId="fund-wallet-modal"
         hydraWallet={wallet}
@@ -426,4 +452,4 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   )
 }
 
-export default WalletDetails;
+export default WalletDetails
