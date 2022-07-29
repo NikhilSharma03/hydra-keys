@@ -9,6 +9,7 @@ import { PublicKey, Transaction } from '@solana/web3.js'
 import FormStateAlert, { FormState } from './FormStateAlert'
 import { useSWRConfig } from 'swr'
 
+
 type AddMemberModalProps = {
   hydraWallet: any
   availableShares: number
@@ -48,12 +49,53 @@ const AddMemberModal = ({
       return
     }
 
+    if (hydraWallet.memberShipType == "Wallet membership") {
+      await walletMembershipCall(values, wallet);
+      resetForm();
+    } else if (hydraWallet.memberShipType == "NFT membership") {
+      await nftMembershipCall(values, wallet);
+      resetForm();
+    }
+
+  }
+
+  const validate = (values: any) => {
+    let errors: FormikErrors<FormValues> = {}
+
+    if (!values.pubkey) {
+      errors.pubkey = 'This field is required'
+    }
+
+    if (!values.shares) {
+      errors.shares = 'Enter a valid number of shares'
+    }
+
+    if (values.shares > availableShares) {
+      errors.shares = `You only have ${availableShares} available shares`
+    }
+
+    return errors
+  }
+
+  const checkNumeric = (event: any) => {
+    if (event.key == '.' || event.key == '-') {
+      event.preventDefault()
+    }
+  }
+
+  const formik = useFormik({
+    initialValues,
+    onSubmit,
+    validate,
+  })
+
+  async function walletMembershipCall(values, wallet) {
     try {
       setLogs([])
       const fanoutSdk = new FanoutClient(connection, wallet)
+      const tx = new Transaction();
 
       // Prepare transaction
-      const tx = new Transaction()
       const ixAddMember = await fanoutSdk.addMemberWalletInstructions({
         fanout: new PublicKey(hydraWallet.pubkey),
         membershipKey: new PublicKey(values.pubkey),
@@ -97,7 +139,6 @@ const AddMemberModal = ({
           setFormState('idle')
         }, 5000)
       }
-      resetForm()
     } catch (error: any) {
       setFormState('error')
       setErrorMsg(`Failed to add member: ${error.message}`)
@@ -107,35 +148,64 @@ const AddMemberModal = ({
     }
   }
 
-  const validate = (values: any) => {
-    let errors: FormikErrors<FormValues> = {}
+  async function nftMembershipCall(values, wallet) {
+    try {
+      setLogs([])
+      const fanoutSdk = new FanoutClient(connection, wallet)
+      const tx = new Transaction();
 
-    if (!values.pubkey) {
-      errors.pubkey = 'This field is required'
+      // Prepare transaction
+      const ixAddMember = await fanoutSdk.addMemberNftInstructions({
+        fanout: new PublicKey(hydraWallet.pubkey),
+        membershipKey: new PublicKey(values.pubkey),
+        shares: values.shares,
+      })
+      tx.add(...ixAddMember.instructions)
+
+      // Sign transaction using user's wallet
+      tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+      tx.feePayer = wallet.publicKey
+      const txSigned = await wallet.signTransaction(tx)
+
+      //Send API request
+      const res = await fetch('/api/addUser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tx: txSigned?.serialize().toString('base64'),
+          memberPubkey: values.pubkey,
+          shareCount: values.shares,
+          walletPubKey: hydraWallet.pubkey,
+          cluster,
+        }),
+      })
+
+      if (res.status === 200) {
+        setFormState('success')
+        // Revalidate wallet details cache
+        setTimeout(function () {
+          mutate(`/api/wallets/${hydraWallet.pubkey}?cluster=${cluster}`)
+        }, 1000)
+      } else {
+        mutate(`/api/wallets/${hydraWallet.pubkey}?cluster=${cluster}`)
+        const json = await res.json()
+        setFormState('error')
+        setErrorMsg(json.msg)
+        setLogs(json.logs)
+        setTimeout(function () {
+          setFormState('idle')
+        }, 5000)
+      }
+    } catch (error: any) {
+      setFormState('error')
+      setErrorMsg(`Failed to add member: ${error.message}`)
+      setTimeout(function () {
+        setFormState('idle')
+      }, 2000)
     }
-
-    if (!values.shares) {
-      errors.shares = 'Enter a valid number of shares'
-    }
-
-    if (values.shares > availableShares) {
-      errors.shares = `You only have ${availableShares} available shares`
-    }
-
-    return errors
   }
-
-  const checkNumeric = (event: any) => {
-    if (event.key == '.' || event.key == '-') {
-      event.preventDefault()
-    }
-  }
-
-  const formik = useFormik({
-    initialValues,
-    onSubmit,
-    validate,
-  })
 
   return (
     <div>
