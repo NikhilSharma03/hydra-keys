@@ -21,6 +21,7 @@ model Wallet {
   totalShares    Int
   cluster        String
   validated      Boolean      @default(false)
+
   @@id([cluster, pubkey])
 }
 
