@@ -66,7 +66,6 @@ const AddMemberModal = ({
       setLogs([])
       const fanoutSdk = new FanoutClient(connection, wallet)
       const tx = new Transaction();
-      let res;
 
       // Prepare transaction
       const ixAddMember = await fanoutSdk.addMemberWalletInstructions({
@@ -82,7 +81,7 @@ const AddMemberModal = ({
       const txSigned = await wallet.signTransaction(tx)
 
       //Send API request
-      res = await fetch('/api/addUser', {
+      const res = await fetch('/api/addUser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -127,10 +126,9 @@ const AddMemberModal = ({
       setLogs([])
       const fanoutSdk = new FanoutClient(connection, wallet)
       const tx = new Transaction();
-      let res;
 
       // Prepare transaction
-      const ixAddMember = await fanoutSdk.addMemberWalletInstructions({
+      const ixAddMember = await fanoutSdk.addMemberNftInstructions({
         fanout: new PublicKey(hydraWallet.pubkey),
         membershipKey: new PublicKey(values.pubkey),
         shares: values.shares,
@@ -143,7 +141,7 @@ const AddMemberModal = ({
       const txSigned = await wallet.signTransaction(tx)
 
       //Send API request
-      res = await fetch('/api/addUser', {
+      const res = await fetch('/api/addUser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
