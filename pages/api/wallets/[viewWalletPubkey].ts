@@ -113,6 +113,23 @@ export default async function handler(
                   },
                 },
               })
+            } else {
+              await prisma.wallet.update({
+                where: {
+                  cluster_pubkey: {
+                    pubkey: viewWalletPubkey,
+                    cluster: cluster,
+                  },
+                },
+                data: {
+                  acceptSPL: {
+                    set: false,
+                  },
+                  splToken: {
+                    set: undefined,
+                  },
+                },
+              })
             }
           }
           // Initialize Object with Wallet Data
