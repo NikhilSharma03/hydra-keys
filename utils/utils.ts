@@ -1,5 +1,7 @@
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+// @ts-ignore
+import { getAccount } from '@solana/spl-token'
 
 export const isValidPubKey = (key: string) => {
   try {
@@ -44,4 +46,15 @@ export const rawAmountToRealString = (rawAmount: string, decimals: number) => {
   amount = amount.replace(/\.$/, '')
 
   return amount
+}
+
+export const getNftOwner = async (
+  connection: Connection,
+  mintPubkey: PublicKey
+) => {
+  const tokenAccountAddress = (
+    await connection.getTokenLargestAccounts(mintPubkey)
+  ).value[0].address
+
+  return (await getAccount(connection, tokenAccountAddress)).owner
 }

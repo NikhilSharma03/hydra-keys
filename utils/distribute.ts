@@ -1,7 +1,6 @@
 import { FanoutClient } from '@glasseaters/hydra-sdk'
-// @ts-ignore
-import { getAccount } from '@solana/spl-token'
 import { PublicKey, Transaction } from '@solana/web3.js'
+import { getNftOwner } from './utils'
 
 type DistributeMemberArgs = {
   fanoutSdk: FanoutClient
@@ -55,12 +54,7 @@ const distributeNftMemberTransaction = async (args: DistributeMemberArgs) => {
   const connection = fanoutSdk.provider.connection
 
   const mintPubkey = new PublicKey(nftMint)
-
-  const tokenAccountAddress = (
-    await connection.getTokenLargestAccounts(mintPubkey)
-  ).value[0].address
-
-  const member = (await getAccount(connection, tokenAccountAddress)).owner
+  const member = await getNftOwner(connection, mintPubkey)
 
   const tx = new Transaction()
 

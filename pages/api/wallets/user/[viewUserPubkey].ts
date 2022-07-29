@@ -37,9 +37,18 @@ export default async function handler(
             {
               membership: {
                 some: {
-                  memberPubkey: {
-                    equals: viewUserPubkey,
-                  },
+                  OR: [
+                    {
+                      memberPubkey: {
+                        equals: viewUserPubkey,
+                      },
+                    },
+                    {
+                      ownerPubkey: {
+                        equals: viewUserPubkey,
+                      },
+                    },
+                  ],
                 },
               },
             },

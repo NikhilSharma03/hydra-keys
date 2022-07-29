@@ -8,7 +8,7 @@ import { FanoutClient } from '@glasseaters/hydra-sdk'
 import { PublicKey, Transaction } from '@solana/web3.js'
 import FormStateAlert, { FormState } from './FormStateAlert'
 import { useSWRConfig } from 'swr'
-
+import { getNftOwner } from '../utils/utils'
 
 type AddMemberModalProps = {
   hydraWallet: any
@@ -49,14 +49,13 @@ const AddMemberModal = ({
       return
     }
 
-    if (hydraWallet.memberShipType == "Wallet membership") {
-      await walletMembershipCall(values, wallet);
-      resetForm();
-    } else if (hydraWallet.memberShipType == "NFT membership") {
-      await nftMembershipCall(values, wallet);
-      resetForm();
+    if (hydraWallet.memberShipType == 'Wallet membership') {
+      await walletMembershipCall(values, wallet)
+      resetForm()
+    } else if (hydraWallet.memberShipType == 'NFT membership') {
+      await nftMembershipCall(values, wallet)
+      resetForm()
     }
-
   }
 
   const validate = (values: any) => {
@@ -93,7 +92,7 @@ const AddMemberModal = ({
     try {
       setLogs([])
       const fanoutSdk = new FanoutClient(connection, wallet)
-      const tx = new Transaction();
+      const tx = new Transaction()
 
       // Prepare transaction
       const ixAddMember = await fanoutSdk.addMemberWalletInstructions({
@@ -152,7 +151,7 @@ const AddMemberModal = ({
     try {
       setLogs([])
       const fanoutSdk = new FanoutClient(connection, wallet)
-      const tx = new Transaction();
+      const tx = new Transaction()
 
       // Prepare transaction
       const ixAddMember = await fanoutSdk.addMemberNftInstructions({
@@ -168,6 +167,9 @@ const AddMemberModal = ({
       const txSigned = await wallet.signTransaction(tx)
 
       //Send API request
+      const ownerPubkey = (
+        await getNftOwner(connection, new PublicKey(values.pubkey))
+      ).toBase58()
       const res = await fetch('/api/addUser', {
         method: 'POST',
         headers: {
@@ -176,6 +178,7 @@ const AddMemberModal = ({
         body: JSON.stringify({
           tx: txSigned?.serialize().toString('base64'),
           memberPubkey: values.pubkey,
+          ownerPubkey,
           shareCount: values.shares,
           walletPubKey: hydraWallet.pubkey,
           cluster,

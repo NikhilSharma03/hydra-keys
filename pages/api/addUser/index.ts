@@ -27,6 +27,7 @@ export default async function handler(
     const {
       tx, // Serialzied  transaction
       memberPubkey,
+      ownerPubkey,
       shareCount,
       walletPubKey,
       cluster,
@@ -43,6 +44,7 @@ export default async function handler(
       const addedUser = await prisma.membership.create({
         data: {
           memberPubkey: memberPubkey,
+          ownerPubkey: ownerPubkey,
           shareCount: shareCount,
           walletPubkey: walletPubKey,
           cluster: cluster,
