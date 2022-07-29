@@ -26,6 +26,7 @@ model Wallet {
 
 model Membership {
   memberPubkey String
+  ownerPubkey  String?
   createdAt    DateTime @default(now())
   shareCount   Int
   cluster      String
