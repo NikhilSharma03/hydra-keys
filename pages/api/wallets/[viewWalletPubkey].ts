@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Membership, PrismaClient } from '@prisma/client'
 import { Connection, clusterApiUrl, Cluster, PublicKey } from '@solana/web3.js'
-import { Fanout } from '@glasseaters/hydra-sdk'
+import { Fanout, FanoutClient, FanoutMint } from '@glasseaters/hydra-sdk'
 
 const prisma = new PrismaClient()
 
@@ -12,16 +12,26 @@ const GetMembershipModel = {
   2: 'Token membership',
 }
 
-async function fetchSPLDetails(cluster, viewWalletPubkey) {
+async function fetchSPLDetails(cluster, viewWalletPubkey, splTokenKey) {
   const connection = new Connection(
     clusterApiUrl(cluster as Cluster),
     'confirmed'
   )
   try {
     let publickey = new PublicKey(viewWalletPubkey)
-    // TODO ***
-    // get SPL details and return
+    const splTK = new PublicKey(splTokenKey)
+    const [fanoutMintKey] = await FanoutClient.fanoutForMintKey(
+      publickey,
+      splTK
+    )
+    const fanoutMint = await FanoutMint.fromAccountAddress(
+      connection,
+      fanoutMintKey
+    )
+    // returning SPL token
+    return fanoutMint.mint.toBase58()
   } catch (err) {
+    console.log(err)
     return null
   }
 }
@@ -79,17 +89,38 @@ export default async function handler(
         const fanoutObj = await validateWallet(cluster, viewWalletPubkey)
         // If exits
         if (fanoutObj) {
-          // Fetch SPL Details (if accept)
-          // TODO
-
+          // Fetch SPL Details and Update wallet if it accept SPL token
+          if (element.acceptSPL) {
+            let splToken = await fetchSPLDetails(
+              cluster,
+              viewWalletPubkey,
+              element.splToken
+            )
+            if (splToken) {
+              await prisma.wallet.update({
+                where: {
+                  cluster_pubkey: {
+                    pubkey: viewWalletPubkey,
+                    cluster: cluster,
+                  },
+                },
+                data: {
+                  acceptSPL: {
+                    set: true,
+                  },
+                  splToken: {
+                    set: splToken,
+                  },
+                },
+              })
+            }
+          }
           // Initialize Object with Wallet Data
           const walletData = {
             name: fanoutObj.name,
             totalShares: fanoutObj.totalShares.toString(),
             membershipModel: GetMembershipModel[fanoutObj.membershipModel],
-            // Field for SPL Token
           }
-          console.log(walletData)
           // Update wallet in DB
           await prisma.wallet.update({
             where: {
@@ -108,12 +139,12 @@ export default async function handler(
               memberShipType: {
                 set: walletData.membershipModel,
               },
-              //   Update SPL Token
               validated: {
                 set: true,
               },
             },
           })
+
           element.validated = true
           res.status(200).json({
             found: true,
