@@ -9,6 +9,7 @@ import { PublicKey, Transaction } from '@solana/web3.js'
 import FormStateAlert, { FormState } from './FormStateAlert'
 import { useSWRConfig } from 'swr'
 
+
 type AddMemberModalProps = {
   hydraWallet: any
   availableShares: number
@@ -35,6 +36,8 @@ const AddMemberModal = ({
   const cluster = useAppSelector(selectCluster)
   const wallet = useAnchorWallet()
 
+  console.log(hydraWallet.memberShipType);
+
   const [formState, setFormState] = useState('idle' as FormState)
   const [errorMsg, setErrorMsg] = useState('')
   const [logs, setLogs] = useState([])
@@ -48,12 +51,24 @@ const AddMemberModal = ({
       return
     }
 
+    if (hydraWallet.memberShipType == "Wallet membership") {
+      await walletMembershipCall(values, wallet);
+      resetForm();
+    } else if (hydraWallet.memberShipType == "NFT membership") {
+      await nftMembershipCall(values, wallet);
+      resetForm();
+    }
+
+  }
+
+  async function walletMembershipCall(values, wallet) {
     try {
       setLogs([])
       const fanoutSdk = new FanoutClient(connection, wallet)
+      const tx = new Transaction();
+      let res;
 
       // Prepare transaction
-      const tx = new Transaction()
       const ixAddMember = await fanoutSdk.addMemberWalletInstructions({
         fanout: new PublicKey(hydraWallet.pubkey),
         membershipKey: new PublicKey(values.pubkey),
@@ -67,7 +82,7 @@ const AddMemberModal = ({
       const txSigned = await wallet.signTransaction(tx)
 
       //Send API request
-      const res = await fetch('/api/addUser', {
+      res = await fetch('/api/addUser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,7 +112,68 @@ const AddMemberModal = ({
           setFormState('idle')
         }, 5000)
       }
-      resetForm()
+      //resetForm()
+    } catch (error: any) {
+      setFormState('error')
+      setErrorMsg(`Failed to add member: ${error.message}`)
+      setTimeout(function () {
+        setFormState('idle')
+      }, 2000)
+    }
+  }
+
+  async function nftMembershipCall(values, wallet) {
+    try {
+      setLogs([])
+      const fanoutSdk = new FanoutClient(connection, wallet)
+      const tx = new Transaction();
+      let res;
+
+      // Prepare transaction
+      const ixAddMember = await fanoutSdk.addMemberWalletInstructions({
+        fanout: new PublicKey(hydraWallet.pubkey),
+        membershipKey: new PublicKey(values.pubkey),
+        shares: values.shares,
+      })
+      tx.add(...ixAddMember.instructions)
+
+      // Sign transaction using user's wallet
+      tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+      tx.feePayer = wallet.publicKey
+      const txSigned = await wallet.signTransaction(tx)
+
+      //Send API request
+      res = await fetch('/api/addUser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tx: txSigned?.serialize().toString('base64'),
+          memberPubkey: values.pubkey,
+          shareCount: values.shares,
+          walletPubKey: hydraWallet.pubkey,
+          cluster,
+        }),
+      })
+
+      if (res.status === 200) {
+        setFormState('success')
+        // Revalidate wallet details cache
+        setTimeout(function () {
+          mutate(`/api/wallets/${hydraWallet.pubkey}?cluster=${cluster}`)
+        }, 1000)
+      } else {
+        mutate(`/api/wallets/${hydraWallet.pubkey}?cluster=${cluster}`)
+        const json = await res.json()
+        setFormState('error')
+        setErrorMsg(json.msg)
+        setLogs(json.logs)
+        setTimeout(function () {
+          setFormState('idle')
+        }, 5000)
+      }
+      //resetForm()
     } catch (error: any) {
       setFormState('error')
       setErrorMsg(`Failed to add member: ${error.message}`)
@@ -220,3 +296,69 @@ const AddMemberModal = ({
 }
 
 export default AddMemberModal
+
+//working code saved just for backup
+/*
+try {
+      setLogs([])
+      const fanoutSdk = new FanoutClient(connection, wallet)
+      const tx = new Transaction();
+      let res;
+
+      // Prepare transaction
+      const ixAddMember = await fanoutSdk.addMemberWalletInstructions({
+        fanout: new PublicKey(hydraWallet.pubkey),
+        membershipKey: new PublicKey(values.pubkey),
+        shares: values.shares,
+      })
+      tx.add(...ixAddMember.instructions)
+
+      // Sign transaction using user's wallet
+      tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+      tx.feePayer = wallet.publicKey
+      const txSigned = await wallet.signTransaction(tx)
+
+      //Send API request
+      res = await fetch('/api/addUser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tx: txSigned?.serialize().toString('base64'),
+          memberPubkey: values.pubkey,
+          shareCount: values.shares,
+          walletPubKey: hydraWallet.pubkey,
+          cluster,
+        }),
+      })
+
+
+
+
+      if (res.status === 200) {
+        setFormState('success')
+        // Revalidate wallet details cache
+        setTimeout(function () {
+          mutate(`/api/wallets/${hydraWallet.pubkey}?cluster=${cluster}`)
+        }, 1000)
+      } else {
+        mutate(`/api/wallets/${hydraWallet.pubkey}?cluster=${cluster}`)
+        const json = await res.json()
+        setFormState('error')
+        setErrorMsg(json.msg)
+        setLogs(json.logs)
+        setTimeout(function () {
+          setFormState('idle')
+        }, 5000)
+      }
+      resetForm()
+    } catch (error: any) {
+      setFormState('error')
+      setErrorMsg(`Failed to add member: ${error.message}`)
+      setTimeout(function () {
+        setFormState('idle')
+      }, 2000)
+    }
+
+*/
