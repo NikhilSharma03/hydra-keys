@@ -368,6 +368,7 @@ const HomeCarousel = () => {
               The Token is the most flexible membership model, but is a bit more
               complicated. In this model, Membership is associated with staked
               ownership of the specified Token.
+              <p className="text-red-500 my-1">This membership model is not supported yet</p>
             </p>
           </div>
         </div>
