@@ -390,6 +390,11 @@ const HomeCarousel = () => {
         }
 
         @media screen and (max-width: 960px) {
+
+          
+          h1{
+            font-size: 40px;
+          }
           .controls {
             display: none;
           }
@@ -404,7 +409,7 @@ const HomeCarousel = () => {
             padding-left: 15px;
             padding-right: 15px;
             height: 180px;
-            font-size: 20px;
+            font-size: 18px;
           }
 
           .desc_one {
