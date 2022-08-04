@@ -178,18 +178,29 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         ...(await connection.getLatestBlockhash()),
       })
 
+      console.log(signature);
+
       if (result.value.err) {
         setFormState('error')
         setErrorMsg(
           `Failed to confirm transaction: ${result.value.err.toString()}`
         )
+        setTimeout(function () {
+          setFormState('idle')
+        }, 6000)
       } else {
         setFormState('success')
+        setTimeout(function () {
+          setFormState('idle')
+        }, 6000)
       }
     } catch (error: any) {
       setLogs(error.logs)
       setFormState('error')
       setErrorMsg(`Failed to distribute wallet funds: ${error.message}`)
+      setTimeout(function () {
+        setFormState('idle')
+      }, 6000)
     }
   }
 
@@ -237,6 +248,8 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         ...(await connection.getLatestBlockhash()),
       })
 
+      console.log(signature);
+
       if (result.value.err) {
         setFormState('error')
         setErrorMsg(
@@ -254,6 +267,9 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
       setLogs(error.logs)
       setFormState('error')
       setErrorMsg(`Failed to distribute wallet funds: ${error.message}`)
+      setTimeout(function () {
+        setFormState('idle')
+      }, 6000)
     }
   }
 
