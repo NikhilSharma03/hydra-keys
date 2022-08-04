@@ -3,9 +3,10 @@ import styles from '../styles/MemembersList.module.css'
 type MemembersDetailsProps = {
   members: Array<any>
   onHandleDistribute: Function
+  availableShares: number
 }
 
-const MembersTable = ({ members, onHandleDistribute }: MemembersDetailsProps ) => {
+const MembersTable = ({ members, onHandleDistribute, availableShares }: MemembersDetailsProps ) => {
   return (
     <table className="table-normal rounded w-full">
       <thead className={`text-xl ${styles.th}`}>
@@ -26,8 +27,9 @@ const MembersTable = ({ members, onHandleDistribute }: MemembersDetailsProps ) =
             <td className="text-center">{member?.shareCount}</td>
             <td className="text-center">
               <button
-                className={`btn bg-[#009000] hover:bg-[#007000] btn w-8/12 sm:w-fit px-6 text-base font-normal border-none ${styles.distributeBtn}`}
+                className={`btn bg-[#009000] hover:bg-[#007000] btn w-8/12 sm:w-fit px-6 text-base font-normal border-none disabled:black-rgba disabled:text-white  ${styles.distributeBtn}`}
                 onClick={() => onHandleDistribute(member?.memberPubkey)}
+                disabled={members.length === 0 || availableShares != 0}
               >
                 Distribute
               </button>

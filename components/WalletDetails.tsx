@@ -370,6 +370,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
             <MembersTable
               members={members}
               onHandleDistribute={handleDistribute}
+              availableShares={availableShares}
             />
           ) : (
             <p className="text-center text-xl font-bold mt-5">
@@ -381,13 +382,15 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
 
       <div className="flex flex-row justify-between items-center font-bold px-8">
         <span>Total Members: {members.length}</span>
+        <div className="tooltip" data-tip="All available shares must be assigned to a member.">
         <button
-          className={`btn bg-[#009000] hover:bg-[#007000] text-white`}
+          className={`btn bg-[#009000] hover:bg-[#007000] text-white text-base font-normal disabled:opacity-30 disabled:bg-gray-600 disabled:text-white`}
           onClick={distributeAll}
-          disabled={formState === 'submitting' || members.length === 0}
+          disabled={formState === 'submitting' || members.length === 0 || availableShares != 0}
         >
           Distribute All
         </button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-5">
@@ -455,7 +458,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         </div>
       </div>
 
-      <AddMemberModal hydraWallet={wallet} availableShares={availableShares} />
+      <AddMemberModal hydraWallet={wallet} availableShares={availableShares}  />
       <FundWalletModal
         modalId="fund-wallet-modal"
         hydraWallet={wallet}

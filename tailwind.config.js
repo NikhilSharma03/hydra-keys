@@ -18,6 +18,11 @@ module.exports = {
   daisyui: {
     themes: [
       {
+        extend: {
+          colors: {
+            'dimmed-rgba': 'rgba(75, 85, 99, 0.3)',
+          },
+        },
         light: {
           ...require('daisyui/src/colors/themes')['[data-theme=light]'],
           primary: '#2F2E41',

@@ -21,6 +21,11 @@
   color: #00d03a;
 }
 
+[data-theme='dark'] .distributeBtn:disabled {
+  background-color: rgba(75, 85, 99,0.3);
+  color: rgba(239, 242, 240, 0.3);
+}
+
 [data-theme='dark'] .distributeBtn:hover {
   background: rgba(0, 208, 58, 0.3);
 }
