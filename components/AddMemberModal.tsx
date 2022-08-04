@@ -144,7 +144,7 @@ const AddMemberModal = ({
         setLogs(json.logs)
         setTimeout(function () {
           setFormState('idle')
-        }, 5000)
+        }, 9000)
       }
     } catch (error: any) {
       console.log("error!!!");
@@ -152,7 +152,7 @@ const AddMemberModal = ({
       setErrorMsg(`Failed to add member: ${error.message}`)
       setTimeout(function () {
         setFormState('idle')
-      }, 2000)
+      }, 9000)
     }
   }
 
@@ -208,14 +208,14 @@ const AddMemberModal = ({
         setLogs(json.logs)
         setTimeout(function () {
           setFormState('idle')
-        }, 5000)
+        }, 9000)
       }
     } catch (error: any) {
       setFormState('error')
       setErrorMsg(`Failed to add member: ${error.message}`)
       setTimeout(function () {
         setFormState('idle')
-      }, 2000)
+      }, 9000)
     }
   }
 
