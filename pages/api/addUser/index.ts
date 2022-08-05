@@ -15,6 +15,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  console.log("ADDING USER");
   if (req.method === 'POST') {
     /* Flow:
      *   - Validate parameters
@@ -35,6 +36,7 @@ export default async function handler(
 
     let insertedIntoDb = false
     let sentTransaction = false
+    
     try {
       //Body for new user should be as follows:
       //memberPubkey

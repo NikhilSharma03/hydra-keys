@@ -9,6 +9,7 @@ import { PublicKey, Transaction } from '@solana/web3.js'
 import FormStateAlert, { FormState } from './FormStateAlert'
 import { useSWRConfig } from 'swr'
 import { getNftOwner } from '../utils/utils'
+import { clusters, Membership, memberShipTypes } from '@prisma/client';
 
 type AddMemberModalProps = {
   hydraWallet: any
@@ -48,15 +49,17 @@ const AddMemberModal = ({
       setErrorMsg('Please connect your wallet!')
       return
     }
-
-    if (hydraWallet.memberShipType == 'Wallet membership') {
+    console.log(hydraWallet.memberShipType);
+    console.log(memberShipTypes.NFT);
+    if (hydraWallet.memberShipType == memberShipTypes.Wallet) {
       await walletMembershipCall(values, wallet)
       resetForm()
-    } else if (hydraWallet.memberShipType == 'NFT membership') {
+    } else if (hydraWallet.memberShipType == memberShipTypes.NFT) {
       await nftMembershipCall(values, wallet)
       resetForm()
     }
   }
+  console.log("hello3");
 
   const validate = (values: any) => {
     let errors: FormikErrors<FormValues> = {}
@@ -75,7 +78,7 @@ const AddMemberModal = ({
 
     return errors
   }
-
+  console.log("hello4");
   const checkNumeric = (event: any) => {
     if (event.key == '.' || event.key == '-') {
       event.preventDefault()
@@ -144,6 +147,7 @@ const AddMemberModal = ({
         }, 5000)
       }
     } catch (error: any) {
+      console.log("error!!!");
       setFormState('error')
       setErrorMsg(`Failed to add member: ${error.message}`)
       setTimeout(function () {

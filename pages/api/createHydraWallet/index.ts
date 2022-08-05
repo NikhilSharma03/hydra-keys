@@ -37,7 +37,7 @@ export default async function handler(
     try {
       /* We may validate the parameters here or through middleware */
       let type:memberShipTypes="NFT"
-
+      console.log(memberShipType);
       if(memberShipType=="Wallet membership"){
         type=memberShipTypes.Wallet;
       }
@@ -47,6 +47,7 @@ export default async function handler(
       else if (memberShipType=="SPL membership"){
         type=memberShipTypes.SPL;
       }
+      
       else{
         throw {
           response: {
@@ -55,6 +56,7 @@ export default async function handler(
         }
 
       }
+      console.log(type);
       // Save wallet into database
       const savedWallet = await prisma.wallet.create({
         data: {

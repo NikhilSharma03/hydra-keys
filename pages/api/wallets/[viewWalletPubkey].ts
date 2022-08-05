@@ -58,17 +58,13 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log(req.query)
   let { cluster, viewWalletPubkey } = req.query
   if (cluster == undefined) {
     cluster = 'devnet' //can later change to mainnet-beta
   }
 
-  console.log(viewWalletPubkey)
   const wallets = await prisma.wallet.findMany()
   const membersdb: Membership[] = await prisma.membership.findMany()
-  console.log(wallets)
-  console.log(membersdb)
   const result=await prisma.membership.findMany(
     {
       where:{
@@ -78,12 +74,10 @@ export default async function handler(
       
     }
   );
-  console.log('result')
-  console.log(result)
 
   for (let index = 0; index < wallets.length; index++) {
     const element = wallets[index]
-    console.log(element.pubkey) //I can do this since wallet addresses must be unique and there will be no two wallets with the same address
+    //I can do this since wallet addresses must be unique and there will be no two wallets with the same address
     if (element.pubkey === viewWalletPubkey && element.cluster == cluster) {
       if (element.validated) {
         res.status(200).json({
@@ -147,7 +141,7 @@ export default async function handler(
             membershipModel: <keyof typeof memberShipTypes> GetMembershipModel[fanoutObj.membershipModel],
           }
           let type:memberShipTypes="NFT"
-          console.log(walletData.membershipModel);
+          
           if(walletData.membershipModel=="Wallet"){
             type=memberShipTypes.Wallet;
           }
