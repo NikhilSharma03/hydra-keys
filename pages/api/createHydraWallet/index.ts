@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
+import { clusters, memberShipTypes, PrismaClient } from '@prisma/client';
 import { clusterApiUrl, Connection, SendTransactionError } from '@solana/web3.js'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 
@@ -36,19 +36,39 @@ export default async function handler(
 
     try {
       /* We may validate the parameters here or through middleware */
+      let type:memberShipTypes="NFT"
+      console.log(memberShipType);
+      if(memberShipType=="Wallet membership"){
+        type=memberShipTypes.Wallet;
+      }
+      else if (memberShipType=="NFT membership"){
+        type=memberShipTypes.NFT;
+      }
+      else if (memberShipType=="SPL membership"){
+        type=memberShipTypes.SPL;
+      }
+      
+      else{
+        throw {
+          response: {
+            msg: `Transaction failed: Failed to create hydrawallet`,
+          },
+        }
 
+      }
+      console.log(type);
       // Save wallet into database
       const savedWallet = await prisma.wallet.create({
         data: {
           name: name,
           pubkey: pubkey,
           authority: authority,
-          memberShipType: memberShipType,
+          memberShipType: type,
           acceptSPL: acceptSPL,
           splToken: splToken,
           // TODO: Include mint public key for Token membership model
           totalShares: totalShares,
-          cluster: cluster,
+          cluster:<keyof typeof clusters> cluster,
         },
       })
       insertedIntoDb = true
@@ -80,7 +100,7 @@ export default async function handler(
           where: {
             cluster_pubkey: {
               pubkey: pubkey,
-              cluster: cluster,
+              cluster:<keyof typeof clusters> cluster,
             },
           },
         })

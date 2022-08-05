@@ -1,8 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Membership, PrismaClient } from '@prisma/client'
+import { clusters, Membership, PrismaClient, memberShipTypes } from '@prisma/client';
 import { Connection, clusterApiUrl, Cluster, PublicKey } from '@solana/web3.js'
 import { Fanout, FanoutClient, FanoutMint } from '@glasseaters/hydra-sdk'
+import { type } from 'os';
 
 const prisma = new PrismaClient()
 
@@ -57,25 +58,26 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log(req.query)
   let { cluster, viewWalletPubkey } = req.query
   if (cluster == undefined) {
     cluster = 'devnet' //can later change to mainnet-beta
   }
 
-  console.log(viewWalletPubkey)
   const wallets = await prisma.wallet.findMany()
   const membersdb: Membership[] = await prisma.membership.findMany()
-  console.log(wallets)
-  console.log(membersdb)
-  const result =
-    await prisma.$queryRaw`SELECT * FROM membership WHERE walletPubkey=${viewWalletPubkey} AND cluster=${cluster}`
-  console.log('result')
-  console.log(result)
+  const result=await prisma.membership.findMany(
+    {
+      where:{
+        walletPubkey:viewWalletPubkey.toString(),
+        cluster:<keyof typeof clusters> cluster
+      },
+      
+    }
+  );
 
   for (let index = 0; index < wallets.length; index++) {
     const element = wallets[index]
-    console.log(element.pubkey) //I can do this since wallet addresses must be unique and there will be no two wallets with the same address
+    //I can do this since wallet addresses must be unique and there will be no two wallets with the same address
     if (element.pubkey === viewWalletPubkey && element.cluster == cluster) {
       if (element.validated) {
         res.status(200).json({
@@ -101,7 +103,7 @@ export default async function handler(
                 where: {
                   cluster_pubkey: {
                     pubkey: viewWalletPubkey,
-                    cluster: cluster,
+                    cluster:<keyof typeof clusters> cluster,
                   },
                 },
                 data: {
@@ -136,14 +138,25 @@ export default async function handler(
           const walletData = {
             name: fanoutObj.name,
             totalShares: fanoutObj.totalShares.toString(),
-            membershipModel: GetMembershipModel[fanoutObj.membershipModel],
+            membershipModel: <keyof typeof memberShipTypes> GetMembershipModel[fanoutObj.membershipModel],
+          }
+          let type:memberShipTypes="NFT"
+          
+          if(walletData.membershipModel=="Wallet"){
+            type=memberShipTypes.Wallet;
+          }
+          else if (walletData.membershipModel=="NFT"){
+            type=memberShipTypes.NFT;
+          }
+          else if (walletData.membershipModel=="SPL"){
+            type=memberShipTypes.SPL;
           }
           // Update wallet in DB
           await prisma.wallet.update({
             where: {
               cluster_pubkey: {
                 pubkey: viewWalletPubkey,
-                cluster: cluster,
+                cluster:<keyof typeof clusters> cluster,
               },
             },
             data: {
@@ -154,7 +167,7 @@ export default async function handler(
                 set: +walletData.totalShares,
               },
               memberShipType: {
-                set: walletData.membershipModel,
+                set: type,
               },
               validated: {
                 set: true,
@@ -174,7 +187,7 @@ export default async function handler(
             where: {
               cluster_pubkey: {
                 pubkey: viewWalletPubkey,
-                cluster: cluster,
+                cluster:<keyof typeof clusters> cluster,
               },
             },
           })

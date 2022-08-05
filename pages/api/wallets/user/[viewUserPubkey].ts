@@ -1,7 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
-
+import { clusters, Membership, PrismaClient,Wallet } from '@prisma/client';
 const prisma = new PrismaClient()
 
 export default async function handler(
@@ -24,7 +23,7 @@ export default async function handler(
       AND: [
         {
           cluster: {
-            equals: cluster,
+            equals:<keyof typeof clusters> cluster,
           },
         },
         {
