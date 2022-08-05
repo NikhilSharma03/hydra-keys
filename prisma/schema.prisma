@@ -6,20 +6,20 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Wallet {
   name           String
   pubkey         String
   authority      String
-  memberShipType String
+  memberShipType memberShipTypes
   acceptSPL      Boolean
   splToken       String?
   membership     Membership[]
   totalShares    Int
-  cluster        String
+  cluster        clusters
   validated      Boolean      @default(false)
 
   @@id([cluster, pubkey])
@@ -30,9 +30,20 @@ model Membership {
   ownerPubkey  String?
   createdAt    DateTime @default(now())
   shareCount   Int
-  cluster      String
+  cluster      clusters
   wallet       Wallet   @relation(references: [cluster, pubkey], fields: [cluster, walletPubkey])
   walletPubkey String
 
   @@id([cluster, walletPubkey, memberPubkey])
+}
+
+enum memberShipTypes{
+  Wallet
+  NFT
+  SPL
+}
+
+enum clusters{
+  devnet
+  mainnet_beta
 }

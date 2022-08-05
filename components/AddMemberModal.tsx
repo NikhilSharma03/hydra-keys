@@ -89,6 +89,7 @@ const AddMemberModal = ({
   })
 
   async function walletMembershipCall(values, wallet) {
+    console.log("hello");
     try {
       setLogs([])
       const fanoutSdk = new FanoutClient(connection, wallet)
@@ -107,7 +108,10 @@ const AddMemberModal = ({
       tx.feePayer = wallet.publicKey
       const txSigned = await wallet.signTransaction(tx)
 
+      console.log("hello");
+
       //Send API request
+
       const res = await fetch('/api/addUser', {
         method: 'POST',
         headers: {
@@ -121,6 +125,7 @@ const AddMemberModal = ({
           cluster,
         }),
       })
+      console.log(res);
 
       if (res.status === 200) {
         setFormState('success')

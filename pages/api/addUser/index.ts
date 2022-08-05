@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
+import { clusters, Membership, PrismaClient, memberShipTypes } from '@prisma/client';
 
 import {
   clusterApiUrl,
@@ -10,7 +10,7 @@ import {
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 
 const prisma = new PrismaClient()
-
+console.log("ADDING USER");
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -40,18 +40,19 @@ export default async function handler(
       //memberPubkey
       //shareCount
       //walletPubkey
-
+      console.log(cluster);
+      console.log("ADDING USER");
       const addedUser = await prisma.membership.create({
         data: {
           memberPubkey: memberPubkey,
           ownerPubkey: ownerPubkey,
           shareCount: shareCount,
           walletPubkey: walletPubKey,
-          cluster: cluster,
+          cluster:<keyof typeof clusters> cluster,
         },
       })
       insertedIntoDb = true
-
+      console.log(addedUser);
       // Forward serialized transaction
       const connection = new Connection(clusterApiUrl(cluster), 'confirmed')
       const signature = await connection.sendEncodedTransaction(tx)
@@ -78,7 +79,7 @@ export default async function handler(
             cluster_walletPubkey_memberPubkey: {
               memberPubkey: memberPubkey,
               walletPubkey: walletPubKey,
-              cluster: cluster,
+              cluster:<keyof typeof clusters> cluster,
             },
           },
         })

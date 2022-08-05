@@ -1,8 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Membership, PrismaClient } from '@prisma/client'
+import { clusters, Membership, PrismaClient, memberShipTypes } from '@prisma/client';
 import { Connection, clusterApiUrl, Cluster, PublicKey } from '@solana/web3.js'
 import { Fanout, FanoutClient, FanoutMint } from '@glasseaters/hydra-sdk'
+import { type } from 'os';
 
 const prisma = new PrismaClient()
 
@@ -68,8 +69,15 @@ export default async function handler(
   const membersdb: Membership[] = await prisma.membership.findMany()
   console.log(wallets)
   console.log(membersdb)
-  const result =
-    await prisma.$queryRaw`SELECT * FROM membership WHERE walletPubkey=${viewWalletPubkey} AND cluster=${cluster}`
+  const result=await prisma.membership.findMany(
+    {
+      where:{
+        walletPubkey:viewWalletPubkey.toString(),
+        cluster:<keyof typeof clusters> cluster
+      },
+      
+    }
+  );
   console.log('result')
   console.log(result)
 
@@ -101,7 +109,7 @@ export default async function handler(
                 where: {
                   cluster_pubkey: {
                     pubkey: viewWalletPubkey,
-                    cluster: cluster,
+                    cluster:<keyof typeof clusters> cluster,
                   },
                 },
                 data: {
@@ -136,14 +144,25 @@ export default async function handler(
           const walletData = {
             name: fanoutObj.name,
             totalShares: fanoutObj.totalShares.toString(),
-            membershipModel: GetMembershipModel[fanoutObj.membershipModel],
+            membershipModel: <keyof typeof memberShipTypes> GetMembershipModel[fanoutObj.membershipModel],
+          }
+          let type:memberShipTypes="NFT"
+          console.log(walletData.membershipModel);
+          if(walletData.membershipModel=="Wallet"){
+            type=memberShipTypes.Wallet;
+          }
+          else if (walletData.membershipModel=="NFT"){
+            type=memberShipTypes.NFT;
+          }
+          else if (walletData.membershipModel=="SPL"){
+            type=memberShipTypes.SPL;
           }
           // Update wallet in DB
           await prisma.wallet.update({
             where: {
               cluster_pubkey: {
                 pubkey: viewWalletPubkey,
-                cluster: cluster,
+                cluster:<keyof typeof clusters> cluster,
               },
             },
             data: {
@@ -154,7 +173,7 @@ export default async function handler(
                 set: +walletData.totalShares,
               },
               memberShipType: {
-                set: walletData.membershipModel,
+                set: type,
               },
               validated: {
                 set: true,
@@ -174,7 +193,7 @@ export default async function handler(
             where: {
               cluster_pubkey: {
                 pubkey: viewWalletPubkey,
-                cluster: cluster,
+                cluster:<keyof typeof clusters> cluster,
               },
             },
           })

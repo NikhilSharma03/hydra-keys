@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
+import { clusters, Membership, PrismaClient, memberShipTypes } from '@prisma/client';
 import {
   clusterApiUrl,
   Connection,
@@ -27,7 +27,7 @@ export default async function handler(
       where: {
         cluster_pubkey: {
           pubkey: walletPubKey,
-          cluster: cluster,
+          cluster: <keyof typeof clusters> cluster,
         },
       },
     })
@@ -47,7 +47,7 @@ export default async function handler(
         where: {
           cluster_pubkey: {
             pubkey: walletPubKey,
-            cluster: cluster,
+            cluster: <keyof typeof clusters> cluster,
           },
         },
         data: {
@@ -81,7 +81,7 @@ export default async function handler(
           where: {
             cluster_pubkey: {
               pubkey: walletPubKey,
-              cluster: cluster,
+              cluster: <keyof typeof clusters> cluster,
             },
           },
           data: {
