@@ -27,7 +27,7 @@ const MembersTable = ({ members, onHandleDistribute, availableShares }: Memember
             <td className="text-center">{member?.shareCount}</td>
             <td className="text-center">
               <button
-                className={`btn bg-[#009000] hover:bg-[#007000] btn w-8/12 sm:w-fit px-6 text-base font-normal border-none disabled:black-rgba disabled:text-white  ${styles.distributeBtn}`}
+                className={`btn bg-[#009000] hover:bg-[#007000] btn w-8/12 sm:w-fit px-6 text-base font-normal border-none disabled:bg-opacity-30 disabled:bg-gray-600 disabled:text-white  ${styles.distributeBtn}`}
                 onClick={() => onHandleDistribute(member?.memberPubkey)}
                 disabled={members.length === 0 || availableShares != 0}
               >
