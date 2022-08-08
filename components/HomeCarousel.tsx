@@ -297,6 +297,7 @@ const HomeCarousel = () => {
                   more complicated. In this model, Membership is associated with
                   staked ownership of the specified Token.
                 </p>
+                <span className="text-red-500 my-1">This membership model is not supported yet</span>
               </div>
               <div className="descriptions__item">
                 <h1>NFT Membership</h1>
@@ -367,6 +368,7 @@ const HomeCarousel = () => {
               The Token is the most flexible membership model, but is a bit more
               complicated. In this model, Membership is associated with staked
               ownership of the specified Token.
+              <p className="text-red-500 my-1">This membership model is not supported yet</p>
             </p>
           </div>
         </div>

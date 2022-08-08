@@ -20,7 +20,6 @@ interface FormValues {
 const membershipModel: Record<string, MembershipModel> = {
   'Wallet membership': MembershipModel.Wallet,
   'NFT membership': MembershipModel.NFT,
-  'Token membership': MembershipModel.Token,
 }
 
 const CreateWalletForm = () => {
@@ -214,7 +213,6 @@ const CreateWalletForm = () => {
           >
             <option>Wallet membership</option>
             <option>NFT membership</option>
-            <option>Token membership</option>
           </select>
         </div>
 
