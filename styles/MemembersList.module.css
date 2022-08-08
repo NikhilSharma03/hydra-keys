@@ -16,12 +16,17 @@
   border-color: rgba(255, 255, 255, 0.6);
 }
 
-.distributeBtn {
+[data-theme='dark'] .distributeBtn {
   background: rgba(0, 208, 58, 0.3);
   color: #00d03a;
 }
 
-.distributeBtn:hover {
+[data-theme='dark'] .distributeBtn:disabled {
+  background-color: rgba(75, 85, 99,0.3);
+  color: rgba(239, 242, 240, 0.3);
+}
+
+[data-theme='dark'] .distributeBtn:hover {
   background: rgba(0, 208, 58, 0.3);
 }
 
@@ -41,7 +46,7 @@
 }
 
 .th::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -63,7 +68,6 @@
 .membersTableBg::-webkit-scrollbar-track {
   background: transparent;
 }
-
 
 .membersTableBg::-webkit-scrollbar-thumb {
   background: grey;
