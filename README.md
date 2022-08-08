@@ -1,23 +1,23 @@
-# Next.js + Tailwind CSS Example
+# Hydra Wallet UI
 
-This example shows how to use [Tailwind CSS](https://tailwindcss.com/) [(v3.0)](https://tailwindcss.com/blog/tailwindcss-v3) with Next.js. It follows the steps outlined in the official [Tailwind docs](https://tailwindcss.com/docs/guides/nextjs).
+A frontend client for [Hydra Wallet](https://github.com/glasseaters/hydra) that supports Wallet and NFT membership models.
 
-## Deploy your own
+## Deployment Guidelines
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example) or preview live with [StackBlitz](https://stackblitz.com/github/vercel/next.js/tree/canary/examples/with-tailwindcss)
+### Database
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/vercel/next.js/tree/canary/examples/with-tailwindcss&project-name=with-tailwindcss&repository-name=with-tailwindcss)
+Create a PostgreSQL database on your favorite hosting provider (e.g.: [Heroku](https://www.heroku.com/postgres)).
 
-## How to use
+Take note of the database connection string, which should look as follows: `postgresql://__USER__:__PASSWORD__@__HOST__/__DATABASE__`
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
+### Frontend Client
 
-```bash
-npx create-next-app --example with-tailwindcss with-tailwindcss-app
-# or
-yarn create next-app --example with-tailwindcss with-tailwindcss-app
-# or
-pnpm create next-app --example with-tailwindcss with-tailwindcss-app
-```
+You can deploy the frontend client to Vercel with the following button:
 
-Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FNikhilSharma03%2Fhydra-keys)
+
+Make sure to set the `DATABASE_URL` environment variable with the connection string of your database.
+
+## Documentation
+
+The documentation for the user interface is available at (TODO: add link).
