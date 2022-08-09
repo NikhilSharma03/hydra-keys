@@ -38,11 +38,14 @@ export default async function handler(
       /* We may validate the parameters here or through middleware */
       let type:memberShipTypes="NFT"
       console.log(memberShipType);
+
       if(memberShipType=="Wallet membership"){
         type=memberShipTypes.Wallet;
+        console.log("changed to wallet");
       }
       else if (memberShipType=="NFT membership"){
         type=memberShipTypes.NFT;
+        console.log("changed to nft");
       }
       else if (memberShipType=="SPL membership"){
         type=memberShipTypes.SPL;
@@ -56,6 +59,7 @@ export default async function handler(
         }
 
       }
+      console.log("type");
       console.log(type);
       // Save wallet into database
       const savedWallet = await prisma.wallet.create({
@@ -72,7 +76,7 @@ export default async function handler(
         },
       })
       insertedIntoDb = true
-
+      console.log(savedWallet);
       // Forward serialized transaction
       const connection = new Connection(clusterApiUrl(cluster), 'confirmed')
       const signature = await connection.sendEncodedTransaction(tx)

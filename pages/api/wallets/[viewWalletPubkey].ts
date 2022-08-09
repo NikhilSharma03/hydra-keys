@@ -99,7 +99,7 @@ export default async function handler(
               element.splToken
             )
             if (splToken) {
-              await prisma.wallet.update({
+              const a = await prisma.wallet.update({
                 where: {
                   cluster_pubkey: {
                     pubkey: viewWalletPubkey,
@@ -115,8 +115,10 @@ export default async function handler(
                   },
                 },
               })
+              console.log("changed at a");
+              console.log(a);
             } else {
-              await prisma.wallet.update({
+              const b = await prisma.wallet.update({
                 where: {
                   cluster_pubkey: {
                     pubkey: viewWalletPubkey,
@@ -132,7 +134,10 @@ export default async function handler(
                   },
                 },
               })
+              console.log("changed at b");
+              console.log(b);
             }
+            
           }
           // Initialize Object with Wallet Data
           const walletData = {
@@ -141,18 +146,20 @@ export default async function handler(
             membershipModel: <keyof typeof memberShipTypes> GetMembershipModel[fanoutObj.membershipModel],
           }
           let type:memberShipTypes="NFT"
-          
-          if(walletData.membershipModel=="Wallet"){
+          console.log(walletData);
+          console.log(walletData.membershipModel);
+          if(walletData.membershipModel.toString()=="Wallet membership"){
             type=memberShipTypes.Wallet;
           }
-          else if (walletData.membershipModel=="NFT"){
+          else if (walletData.membershipModel.toString()=="NFT membership"){
             type=memberShipTypes.NFT;
           }
-          else if (walletData.membershipModel=="SPL"){
+          else if (walletData.membershipModel.toString()=="SPL membership"){
             type=memberShipTypes.SPL;
           }
+          console.log(type);
           // Update wallet in DB
-          await prisma.wallet.update({
+          const c=await prisma.wallet.update({
             where: {
               cluster_pubkey: {
                 pubkey: viewWalletPubkey,
@@ -174,6 +181,8 @@ export default async function handler(
               },
             },
           })
+          console.log("changed at c");
+          console.log(c);
 
           element.validated = true
           res.status(200).json({
