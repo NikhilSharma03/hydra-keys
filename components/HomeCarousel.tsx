@@ -392,6 +392,11 @@ const HomeCarousel = () => {
         }
 
         @media screen and (max-width: 960px) {
+
+          
+          h1{
+            font-size: 40px;
+          }
           .controls {
             display: none;
           }
@@ -406,28 +411,28 @@ const HomeCarousel = () => {
             padding-left: 15px;
             padding-right: 15px;
             height: 180px;
-            font-size: 20px;
+            font-size: 18px;
           }
 
           .desc_one {
-            background-image: url('/NFT.png');
+            background-image: url('/NFT_low_opacity.png');
             background-repeat: no-repeat;
             background-position: 50%;
-            background-size: 120px 120px;
+            background-size: 12rem 12rem;
           }
 
           .desc_two {
-            background-image: url('/wallet.png');
+            background-image: url('/walletnew_low_opacity.png');
             background-repeat: no-repeat;
             background-position: 50%;
-            background-size: 120px 120px;
+            background-size: 12rem 12rem;
           }
 
           .desc_three {
-            background-image: url('/token.png');
+            background-image: url('/token_low_opacity.png');
             background-repeat: no-repeat;
             background-position: 50%;
-            background-size: 120px 120px;
+            background-size: 12rem 12rem;
           }
 
           .slider {
