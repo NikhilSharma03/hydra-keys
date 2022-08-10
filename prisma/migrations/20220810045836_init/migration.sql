@@ -1,13 +1,19 @@
+-- CreateEnum
+CREATE TYPE "memberShipTypes" AS ENUM ('Wallet', 'NFT', 'SPL');
+
+-- CreateEnum
+CREATE TYPE "clusters" AS ENUM ('devnet', 'mainnet_beta');
+
 -- CreateTable
 CREATE TABLE "Wallet" (
     "name" TEXT NOT NULL,
     "pubkey" TEXT NOT NULL,
     "authority" TEXT NOT NULL,
-    "memberShipType" TEXT NOT NULL,
+    "memberShipType" "memberShipTypes" NOT NULL,
     "acceptSPL" BOOLEAN NOT NULL,
     "splToken" TEXT,
     "totalShares" INTEGER NOT NULL,
-    "cluster" TEXT NOT NULL,
+    "cluster" "clusters" NOT NULL,
     "validated" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Wallet_pkey" PRIMARY KEY ("cluster","pubkey")
@@ -19,7 +25,7 @@ CREATE TABLE "Membership" (
     "ownerPubkey" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "shareCount" INTEGER NOT NULL,
-    "cluster" TEXT NOT NULL,
+    "cluster" "clusters" NOT NULL,
     "walletPubkey" TEXT NOT NULL,
 
     CONSTRAINT "Membership_pkey" PRIMARY KEY ("cluster","walletPubkey","memberPubkey")
