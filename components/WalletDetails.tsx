@@ -382,9 +382,9 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         </div>
       </div>
 
-      <div className="flex flex-row justify-between items-center font-bold px-8">
+      <div className="flex flex-col gap-y-2 md:flex-row justify-between items-center font-bold px-8 w-full">
         <span>Total Members: {members.length}</span>
-        <div className="tooltip" data-tip="All available shares must be assigned to a member.">
+        <div className="tooltip tooltip-bottom md:tooltip-left" data-tip="All available shares must be assigned to a member.">
         <button
           className={`btn bg-[#009000] hover:bg-[#007000] text-white text-base font-normal disabled:opacity-30 disabled:bg-gray-600 disabled:text-white`}
           onClick={distributeAll}
