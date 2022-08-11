@@ -1,6 +1,7 @@
 import { FanoutClient } from '@glasseaters/hydra-sdk'
 import { PublicKey, Transaction } from '@solana/web3.js'
 import { getNftOwner } from './utils'
+import { memberShipTypes } from '@prisma/client';
 
 type DistributeMemberArgs = {
   fanoutSdk: FanoutClient
@@ -85,8 +86,8 @@ const distributeNftMemberTransaction = async (args: DistributeMemberArgs) => {
 }
 
 const distributeMemberTransactionTable = {
-  ['Wallet membership']: distributeWalletMemberTransaction,
-  ['NFT membership']: distributeNftMemberTransaction,
+  [memberShipTypes.Wallet]: distributeWalletMemberTransaction,
+  [memberShipTypes.NFT]: distributeNftMemberTransaction,
 }
 
 export const distributeMemberTransaction = async (
