@@ -124,13 +124,14 @@ const FundWalletModal = ({
       } else {
         setFormState('success')
         updateRefresh({ msg: 'success' })
-        resetForm()
       }
     } catch (error: any) {
       setErrorLogs(error.logs)
       setFormState('error')
       setErrorMsg(`Failed to fund wallet: ${error.message}`)
     }
+
+    resetForm()
   }
 
   const validate = async (values: FormValues) => {

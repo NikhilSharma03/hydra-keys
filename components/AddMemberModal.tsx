@@ -227,6 +227,7 @@ const AddMemberModal = ({
           id="add-member-modal"
           className="modal-toggle"
           ref={toggleRef}
+          onChange={(e) => setFormState('idle') }
         />
         <label
           htmlFor="add-member-modal"
