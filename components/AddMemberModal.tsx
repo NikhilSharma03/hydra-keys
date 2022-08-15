@@ -59,7 +59,6 @@ const AddMemberModal = ({
       resetForm()
     }
   }
-  console.log("hello3");
 
   const validate = (values: any) => {
     let errors: FormikErrors<FormValues> = {}
@@ -78,7 +77,7 @@ const AddMemberModal = ({
 
     return errors
   }
-  console.log("hello4");
+
   const checkNumeric = (event: any) => {
     if (event.key == '.' || event.key == '-') {
       event.preventDefault()
@@ -92,7 +91,6 @@ const AddMemberModal = ({
   })
 
   async function walletMembershipCall(values, wallet) {
-    console.log("hello");
     try {
       setLogs([])
       const fanoutSdk = new FanoutClient(connection, wallet)
@@ -111,7 +109,6 @@ const AddMemberModal = ({
       tx.feePayer = wallet.publicKey
       const txSigned = await wallet.signTransaction(tx)
 
-      console.log("hello");
 
       //Send API request
 

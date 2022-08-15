@@ -190,6 +190,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         }, 6000)
       } else {
         setFormState('success')
+        await fetchData()
         setTimeout(function () {
           setFormState('idle')
         }, 6000)
