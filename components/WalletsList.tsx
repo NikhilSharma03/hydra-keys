@@ -4,6 +4,7 @@ import Link from 'next/link'
 import styles from '../styles/WalletsList.module.css'
 
 export interface WalletInfo {
+  memberShipType: string
   name: string
   pubkey: string
   authority: string
@@ -42,6 +43,7 @@ const WalletsList = ({ className, wallets }: WalletsListProps) => {
                       ? 'You'
                       : shortenPubkey(wallet.authority)}
                   </span>
+                  <span>{wallet.memberShipType}</span>
                 </a>
               </Link>
             </li>
