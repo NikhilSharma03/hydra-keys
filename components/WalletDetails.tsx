@@ -207,15 +207,6 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
 
   const distributeAll = async () => {
 
-    if(balance === 0)
-    {
-      setFormState('error')
-      setErrorMsg(`You have ${balance} SOL in your native wallet. Please add some funding.`)
-      setTimeout(function () {
-        setFormState('idle')
-      }, 4000)
-      return
-    }
     if (!anchorwallet) {
       setFormState('error')
       setErrorMsg('Please connect your wallet!')
