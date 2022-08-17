@@ -396,7 +396,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         htmlFor="alert-box-toggle"
           className={`btn bg-[#009000] hover:bg-[#007000] text-white text-base font-normal disabled:opacity-30 disabled:bg-gray-600 disabled:text-white`}
           onClick={() => {balance != 0 && distributeAll}}
-          // disabled={formState === 'submitting' || members.length === 0 || availableShares != 0}
+          disabled={formState === 'submitting' || members.length === 0 || availableShares != 0}
         >
           Distribute All
         </label>
