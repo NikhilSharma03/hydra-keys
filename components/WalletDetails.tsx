@@ -206,6 +206,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   }
 
   const distributeAll = async () => {
+
     if (!anchorwallet) {
       setFormState('error')
       setErrorMsg('Please connect your wallet!')

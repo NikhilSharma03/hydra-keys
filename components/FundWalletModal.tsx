@@ -126,9 +126,14 @@ const FundWalletModal = ({
         updateRefresh({ msg: 'success' })
       }
     } catch (error: any) {
-      setErrorLogs(error.logs)
       setFormState('error')
-      setErrorMsg(`Failed to fund wallet: ${error.message}`)
+      if (error.logs?.[1].includes('insufficient lamports')) {
+        setErrorMsg("Insufficient SOL.")
+      }
+      else{
+        setErrorLogs(error.logs)
+        setErrorMsg(`Failed to fund wallet: ${error.message}`)
+      }
     }
 
     resetForm()
