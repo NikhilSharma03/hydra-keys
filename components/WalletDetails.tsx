@@ -10,10 +10,11 @@ import AddMemberModal from './AddMemberModal'
 import MembersTable from './MembersTable'
 import EditSPLToken from './EditSPLToken'
 import FundWalletModal from './FundWalletModal'
+import AlertBox from './AlertBox'
 import styles from '../styles/MemembersList.module.css'
 import Link from 'next/link'
 import { Fanout, FanoutClient } from '@glasseaters/hydra-sdk'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
 import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
 //@ts-ignore
@@ -47,10 +48,15 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   const anchorwallet = useAnchorWallet()
   const [balance, setBalance] = useState(0)
   const [splbalance, setsplbalance] = useState('0')
+  const toggleRef = useRef<HTMLInputElement>(null)
 
   //toggle refresh page on fund distribution
   const updateRefresh = (newRefresh: { msg: string }) => {
     setRefresh(newRefresh)
+  }
+
+  const disableOnDistribute = () => {
+    formState === 'submitting' || members.length === 0 || availableShares != 0
   }
 
   const fetchTokenBalance = useCallback(async () => {
@@ -178,7 +184,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         ...(await connection.getLatestBlockhash()),
       })
 
-      console.log(signature);
+      console.log(signature)
 
       if (result.value.err) {
         setFormState('error')
@@ -206,7 +212,6 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
   }
 
   const distributeAll = async () => {
-
     if (!anchorwallet) {
       setFormState('error')
       setErrorMsg('Please connect your wallet!')
@@ -250,7 +255,7 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         ...(await connection.getLatestBlockhash()),
       })
 
-      console.log(signature);
+      console.log(signature)
 
       if (result.value.err) {
         setFormState('error')
@@ -289,6 +294,9 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
           <label htmlFor="fund-wallet-modal" className="btn btn-secondary">
             Fund Wallet
           </label>
+          {/* <label htmlFor="alert-box-toggle" className="btn btn-secondary">
+            alert
+          </label> */}
           {isAuthority() ? (
             <div className="tooltip tooltip-secondary" data-tip="Add members">
               <label
@@ -384,14 +392,27 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
 
       <div className="flex flex-col gap-y-2 md:flex-row justify-between items-center font-bold px-8 w-full">
         <span>Total Members: {members.length}</span>
-        <div className="tooltip tooltip-bottom md:tooltip-left" data-tip="All available shares must be assigned to a member.">
-        <button
-          className={`btn bg-[#009000] hover:bg-[#007000] text-white text-base font-normal disabled:opacity-30 disabled:bg-gray-600 disabled:text-white`}
-          onClick={distributeAll}
-          disabled={formState === 'submitting' || members.length === 0 || availableShares != 0}
+        <div
+          className="tooltip"
+          data-tip="All available shares must be assigned to a member."
         >
-          Distribute All
-        </button>
+          <button
+            className={`btn bg-[#009000] hover:bg-[#007000] text-white text-base font-normal disabled:opacity-30 disabled:bg-gray-600 disabled:text-white`}
+            onClick={() => {
+              if (balance === 0 && splbalance === '0') {
+                toggleRef.current?.click()
+              } else {
+                distributeAll()
+              }
+            }}
+            disabled={
+              formState === 'submitting' ||
+              members.length === 0 ||
+              availableShares != 0
+            }
+          >
+            Distribute All
+          </button>
         </div>
       </div>
 
@@ -460,7 +481,8 @@ const WalletDetails = ({ initialWallet, members }: WalletDetailsProps) => {
         </div>
       </div>
 
-      <AddMemberModal hydraWallet={wallet} availableShares={availableShares}  />
+      <AddMemberModal hydraWallet={wallet} availableShares={availableShares} />
+      <AlertBox ref={toggleRef} />
       <FundWalletModal
         modalId="fund-wallet-modal"
         hydraWallet={wallet}
