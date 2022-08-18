@@ -1,8 +1,7 @@
-import { useState } from 'react'
-import { useRef } from 'react'
+import { forwardRef, useRef } from 'react'
 
-const AlertBox = () => {
-  let toggleRef = useRef<HTMLInputElement>(null)
+const AlertBox = forwardRef<HTMLInputElement>((props, ref) => {
+  const cancelRef = useRef<HTMLLabelElement>(null)
 
   return (
     <div>
@@ -10,7 +9,7 @@ const AlertBox = () => {
         type="checkbox"
         id="alert-box-toggle"
         className="modal-toggle"
-        ref={toggleRef}
+        ref={ref}
       />
       <label
         htmlFor="alert-box-toggle"
@@ -23,13 +22,16 @@ const AlertBox = () => {
 
           <div className="flex w-full justify-end gap-4">
             <div className="modal-action">
-              <label className="btn btn-primary" htmlFor="fund-wallet-modal">
+              <label
+                className="btn btn-primary"
+                htmlFor="fund-wallet-modal"
+                onClick={() => cancelRef.current?.click() }>
                 Fund Wallet
               </label>
             </div>
 
             <div className="modal-action">
-              <label className="btn" htmlFor="alert-box-toggle">
+              <label className="btn" htmlFor="alert-box-toggle" ref={cancelRef}>
                 Cancel
               </label>
             </div>
@@ -38,6 +40,8 @@ const AlertBox = () => {
       </label>
     </div>
   )
-}
+})
+
+AlertBox.displayName = 'AlertBox'
 
 export default AlertBox
